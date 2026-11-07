@@ -4,12 +4,17 @@ import { resolveLocale } from "@/i18n/resolve";
 import { requireUser } from "@/lib/auth/session";
 import { getCart } from "@/lib/public/queries";
 import { removeFromCartForm } from "@/lib/public/actions";
+import { checkout } from "@/lib/orders/actions";
 import { formatMnt } from "@/lib/money";
 import { PageIntro } from "@/components/layout/page-intro";
 import { primaryButton, textLink } from "@/components/ui/styles";
 
-export default async function CartPage({ params }: PageProps<"/[locale]/cart">) {
+const ERROR_KEYS = ["payment_unavailable", "cart_empty", "generic"] as const;
+
+export default async function CartPage({ params, searchParams }: PageProps<"/[locale]/cart">) {
   const locale = resolveLocale((await params).locale);
+  const { error } = await searchParams;
+  const errorKey = ERROR_KEYS.find((k) => k === error);
   await requireUser(locale, `/${locale}/cart`);
   const dict = getDictionary(locale);
   const t = dict.cart;
@@ -57,8 +62,11 @@ export default async function CartPage({ params }: PageProps<"/[locale]/cart">) 
             <span className="text-zinc-600">{t.total}</span>
             <span className="font-mono text-2xl text-zinc-950">{formatMnt(total)}₮</span>
           </div>
-          <button type="button" disabled className={`${primaryButton} w-full cursor-not-allowed opacity-50`}>{t.checkout}</button>
-          <p className="text-sm text-zinc-500">{t.checkoutSoon}</p>
+          <form action={checkout}>
+            <input type="hidden" name="locale" value={locale} />
+            <button type="submit" disabled={!available.length} className={`${primaryButton} w-full disabled:cursor-not-allowed disabled:opacity-50`}>{t.checkout}</button>
+          </form>
+          {errorKey && <p role="alert" className="text-sm text-red-700">{t.errors[errorKey]}</p>}
           <Link href={`/${locale}/events`} className={`${textLink} text-sm`}>{t.browse}</Link>
         </aside>
       </div>
