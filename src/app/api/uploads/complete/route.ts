@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { crossSiteRejected, isSameOrigin } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { headObjectSize } from "@/lib/r2";
@@ -10,6 +11,7 @@ type Row = { id: string; original_key: string; bytes: number; uploaded_by: strin
  * expected size before the photo moves on to processing.
  */
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) return crossSiteRejected();
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

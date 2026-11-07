@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { crossSiteRejected, isSameOrigin } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getEventCodes } from "@/lib/public/codes";
@@ -17,6 +18,7 @@ const error = (code: string, status: number) => NextResponse.json({ error: code 
  * The selfie is never written to disk or storage.
  */
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) return crossSiteRejected();
   if (!(await getCurrentUser())) return error("unauthorized", 401);
   const aiUrl = process.env.AI_SERVICE_URL;
   const aiToken = process.env.AI_SERVICE_TOKEN;

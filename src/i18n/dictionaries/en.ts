@@ -330,6 +330,7 @@ export const en: Dictionary = {
       finished: "Finished",
       invalidPrice: "Price must be a whole number from 0 to 10,000,000₮.",
       forbidden: "You are not allowed to upload to this event.",
+      rateLimited: "At most 3,000 photos per hour. Please wait a little and continue.",
       failed: "Some files could not be uploaded. Please try again.",
       counts: { done: "Uploaded", duplicate: "Duplicates", invalid: "Not accepted", error: "Failed" },
       status: { queued: "Waiting", hashing: "Checking", uploading: "", done: "Uploaded", duplicate: "Duplicate, skipped", invalid: "Not an accepted image", error: "Failed" },
@@ -554,6 +555,29 @@ export const en: Dictionary = {
     photographerTitle: "Photographer dashboard",
     photographerLead: "Events, uploads, sales and earnings will live here.",
     comingNext: "Added in the next phase.",
+  },
+  notFound: {
+    title: "Page not found",
+    body: "The page you are looking for does not exist or has moved.",
+    home: "Home",
+    events: "Browse events",
+  },
+  error: {
+    title: "Something went wrong",
+    body: "A temporary error occurred. Please try again.",
+    retry: "Try again",
+  },
+  deleteAccount: {
+    title: "Delete account",
+    body: "Your name, phone, cart, notifications, face-recognition consent and search history are deleted, and you lose access to your purchased photos. Purchase records are kept without your name, as accounting rules require. This cannot be undone.",
+    confirm: "I want to permanently delete my account.",
+    submit: "Delete account",
+    errors: {
+      admin_cannot_delete: "Admin accounts cannot be deleted here.",
+      photographer_contact_admin: "To delete a photographer account, contact an admin (photos, earnings and payouts need to be settled).",
+      confirm_required: "Tick the confirmation box.",
+      generic: "Something went wrong. Please try again.",
+    },
   },
   forbidden: {
     title: "Access denied",

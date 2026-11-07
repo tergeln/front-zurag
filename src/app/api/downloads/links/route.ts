@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { crossSiteRejected, isSameOrigin } from "@/lib/http";
 import { getCurrentUser } from "@/lib/auth/session";
 import { ZIP_MAX_PHOTOS, signedOriginalLinks } from "@/lib/downloads";
 
@@ -9,6 +10,7 @@ import { ZIP_MAX_PHOTOS, signedOriginalLinks } from "@/lib/downloads";
  * to hold hundreds of megabytes (Cloudflare Workers have tight limits).
  */
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) return crossSiteRejected();
   if (!(await getCurrentUser())) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const body = (await request.json().catch(() => null)) as { photoIds?: unknown } | null;
   const ids = Array.isArray(body?.photoIds) ? body.photoIds.filter((x): x is string => typeof x === "string") : [];

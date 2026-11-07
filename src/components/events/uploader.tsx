@@ -103,7 +103,7 @@ export function Uploader({ eventId, defaultPrice, t }: { eventId: string; defaul
           });
           if (!res.ok) {
             patch(valid.map((v) => v.item.id), { status: "error" });
-            setError(res.status === 403 ? t.forbidden : t.failed);
+            setError(res.status === 403 ? t.forbidden : res.status === 429 ? t.rateLimited : t.failed);
             continue;
           }
           const { results } = (await res.json()) as { results: { index: number; duplicate?: true; photoId?: string; uploadUrl?: string }[] };

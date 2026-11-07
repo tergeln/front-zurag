@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { crossSiteRejected, isSameOrigin } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { presignPut } from "@/lib/r2";
@@ -12,6 +13,7 @@ type UploadRow = { file_index: number; photo_id: string | null; original_key: st
  * signs one short-lived PUT URL per new file. Files go straight to R2.
  */
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) return crossSiteRejected();
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
@@ -25,7 +27,7 @@ export async function POST(request: NextRequest) {
     p_files: body.files.map((f) => ({ sha256: f.sha256, bytes: f.size, mime: f.type, filename: f.name })),
   });
   if (error) {
-    const status = error.message === "forbidden" ? 403 : error.message === "not_found" ? 404 : 400;
+    const status = error.message === "forbidden" ? 403 : error.message === "not_found" ? 404 : error.message === "rate_limited" ? 429 : 400;
     return NextResponse.json({ error: error.message }, { status });
   }
 
