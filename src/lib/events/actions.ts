@@ -122,6 +122,19 @@ export async function removeParticipant(formData: FormData) {
   revalidatePath(back);
 }
 
+/** Turning face search on requires the attendee-notice confirmation; the database records it as consent. */
+export async function setFaceSearch(formData: FormData) {
+  const locale = readLocale(formData);
+  const supabase = await requireSignedIn(locale);
+  const back = backPath(formData, locale);
+  const enable = formData.get("enabled") === "true";
+  if (enable && formData.get("attestation") !== "on") redirect(withError(back, "needAttestation"));
+
+  const { error } = await supabase.rpc("set_event_face_search", { p_event_id: String(formData.get("eventId")), p_enabled: enable });
+  if (error) redirect(withError(back, errorKey(error.message)));
+  revalidatePath(back);
+}
+
 function selectedIds(formData: FormData): string[] {
   return formData
     .getAll("photoIds")

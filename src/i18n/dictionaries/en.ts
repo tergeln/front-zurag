@@ -158,7 +158,17 @@ export const en: Dictionary = {
       notFound: "Event not found.",
       notPhotographer: "No approved photographer has this email.",
       invalidPrice: "Price must be a whole number from 0 to 10,000,000₮.",
+      needAttestation: "Tick the confirmation before turning face search on.",
       generic: "Something went wrong. Please try again.",
+    },
+    faceSearch: {
+      title: "Face search",
+      on: "On: customers can search this event with a selfie (once the event is published).",
+      off: "Off: selfie search is not available for this event.",
+      attestation: "I confirm that attendees were told in advance about photography and face-recognition search.",
+      enable: "Turn on face search",
+      disable: "Turn off face search",
+      needAttestation: "Tick the confirmation before turning it on.",
     },
     participants: {
       title: "Participating photographers",

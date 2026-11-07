@@ -9,9 +9,10 @@ import { PageIntro } from "@/components/layout/page-intro";
 import { EventForm } from "@/components/events/event-form";
 import { Uploader } from "@/components/events/uploader";
 import { PhotoTable } from "@/components/events/photo-table";
+import { FaceSearchToggle } from "@/components/events/face-search-toggle";
 import { inputClass, secondaryButton, textLink } from "@/components/ui/styles";
 
-const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "generic"];
+const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "needAttestation", "generic"];
 
 export default async function AdminEventPage({ params, searchParams }: PageProps<"/[locale]/admin/events/[id]">) {
   const { locale: rawLocale, id } = await params;
@@ -77,6 +78,8 @@ export default async function AdminEventPage({ params, searchParams }: PageProps
           <button type="submit" className={secondaryButton}>{t.participants.add}</button>
         </form>
       </section>
+
+      <FaceSearchToggle locale={locale} t={t.faceSearch} event={event} back={back} />
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-zinc-950">{t.details}</h2>

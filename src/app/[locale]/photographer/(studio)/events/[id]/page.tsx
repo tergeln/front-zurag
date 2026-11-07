@@ -9,9 +9,10 @@ import { PageIntro } from "@/components/layout/page-intro";
 import { EventForm } from "@/components/events/event-form";
 import { Uploader } from "@/components/events/uploader";
 import { PhotoTable } from "@/components/events/photo-table";
+import { FaceSearchToggle } from "@/components/events/face-search-toggle";
 import { textLink } from "@/components/ui/styles";
 
-const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "generic"];
+const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "needAttestation", "generic"];
 
 export default async function StudioEventPage({ params, searchParams }: PageProps<"/[locale]/photographer/events/[id]">) {
   const { locale: rawLocale, id } = await params;
@@ -44,6 +45,8 @@ export default async function StudioEventPage({ params, searchParams }: PageProp
         <h2 className="text-lg font-semibold text-zinc-950">{t.photos.mine}</h2>
         <PhotoTable locale={locale} t={t} rows={photos.rows} total={photos.total} page={page} back={back} showOwner={false} />
       </section>
+
+      {role === "owner" && <FaceSearchToggle locale={locale} t={t.faceSearch} event={event} back={back} />}
 
       {role === "owner" && (
         <section className="flex flex-col gap-4">
