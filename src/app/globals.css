@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/* Light theme only (spec: clean light theme). One neutral family (zinc) + one accent. */
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --color-paper: #fafaf9;
+  --color-ink: #18181b;
+  --color-accent: #b4532a;
+  --color-accent-strong: #96431f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
