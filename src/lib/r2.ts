@@ -33,6 +33,15 @@ export async function presignPut(key: string, contentType: string, expiresIn = 9
   return signed.url;
 }
 
+/** A URL that lets the holder GET one object for `expiresIn` seconds. */
+export async function presignGet(key: string, expiresIn = 600): Promise<string> {
+  const { client, base } = config();
+  const url = new URL(objectUrl(base, key));
+  url.searchParams.set("X-Amz-Expires", String(expiresIn));
+  const signed = await client.sign(new Request(url, { method: "GET" }), { aws: { signQuery: true } });
+  return signed.url;
+}
+
 /** Size in bytes of a stored object, or null if it does not exist. */
 export async function headObjectSize(key: string): Promise<number | null> {
   const { client, base } = config();

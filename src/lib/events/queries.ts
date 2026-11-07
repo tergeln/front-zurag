@@ -20,6 +20,7 @@ export type EventRow = {
 
 export type PhotoRow = {
   id: string;
+  thumb_key: string | null;
   original_filename: string | null;
   bytes: number;
   price_mnt: number;
@@ -77,7 +78,7 @@ export async function listPhotos(eventId: string, page: number): Promise<{ rows:
   const supabase = await createClient();
   const { data, count } = await supabase
     .from("photos")
-    .select("id, original_filename, bytes, price_mnt, status, owner_type, created_at, owner:users!photos_owner_id_fkey(full_name)", { count: "exact" })
+    .select("id, thumb_key, original_filename, bytes, price_mnt, status, owner_type, created_at, owner:users!photos_owner_id_fkey(full_name)", { count: "exact" })
     .eq("event_id", eventId)
     .neq("status", "deleted")
     .order("created_at", { ascending: false })

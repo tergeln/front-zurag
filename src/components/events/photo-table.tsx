@@ -57,7 +57,19 @@ export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Pr
                 <td className="px-4 py-2.5">
                   <input type="checkbox" name="photoIds" value={r.id} aria-label={r.original_filename ?? r.id} className="size-4 accent-zinc-900" />
                 </td>
-                <td className="max-w-xs truncate px-4 py-2.5 text-zinc-800">{r.original_filename ?? r.id}</td>
+                <td className="max-w-xs px-4 py-2.5 text-zinc-800">
+                  <div className="flex items-center gap-3">
+                    {r.thumb_key ? (
+                      <a href={`/api/photos/${r.id}/image?variant=preview`} target="_blank" rel="noopener" className="shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- signed, short-lived R2 URL via redirect */}
+                        <img src={`/api/photos/${r.id}/image?variant=thumb`} alt="" loading="lazy" className="size-12 rounded-md bg-zinc-100 object-cover" />
+                      </a>
+                    ) : (
+                      <span className="size-12 shrink-0 rounded-md bg-zinc-100" />
+                    )}
+                    <span className="truncate">{r.original_filename ?? r.id}</span>
+                  </div>
+                </td>
                 {showOwner && (
                   <td className="px-4 py-2.5 text-zinc-600">{r.owner_type === "platform" ? t.company : (r.owner?.full_name ?? "—")}</td>
                 )}
