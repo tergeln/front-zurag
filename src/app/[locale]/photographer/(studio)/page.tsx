@@ -6,12 +6,14 @@ import { getSettings } from "@/lib/settings";
 import { bpToPercent, formatMnt, splitSale } from "@/lib/money";
 import { PageIntro } from "@/components/layout/page-intro";
 import { textLink } from "@/components/ui/styles";
+import { BalanceCards } from "@/components/earnings/balance-cards";
+import { getMyBalance } from "@/lib/earnings/queries";
 
 export default async function StudioOverviewPage({ params }: PageProps<"/[locale]/photographer">) {
   const locale = resolveLocale((await params).locale);
   // Only approved photographers. Pending, rejected and suspended go to the status page.
   const { profile } = await requireApprovedPhotographer(locale, `/${locale}/photographer`);
-  const { commissionBp } = await getSettings();
+  const [{ commissionBp }, balance] = await Promise.all([getSettings(), getMyBalance()]);
   const dict = getDictionary(locale);
   const t = dict.studio;
   const example = splitSale(10000, commissionBp);
@@ -40,14 +42,7 @@ export default async function StudioOverviewPage({ params }: PageProps<"/[locale
         </section>
       </div>
 
-      <section className="flex max-w-4xl flex-col gap-3 rounded-2xl border border-dashed border-zinc-300 p-6">
-        <h2 className="text-sm font-medium text-zinc-500">{t.upcomingTitle}</h2>
-        <ul className="grid grid-cols-1 gap-2 text-zinc-700 sm:grid-cols-2">
-          {t.upcoming.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
+      <BalanceCards balance={balance} t={dict.money} />
     </PageIntro>
   );
 }

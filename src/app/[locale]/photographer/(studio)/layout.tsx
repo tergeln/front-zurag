@@ -15,6 +15,8 @@ export default async function StudioLayout({ children, params }: LayoutProps<"/[
         items={[
           { href: base, label: t.overview },
           { href: `${base}/events`, label: t.events },
+          { href: `${base}/sales`, label: t.sales },
+          { href: `${base}/payouts`, label: t.payouts },
           { href: `${base}/profile`, label: t.profile },
         ]}
       />
