@@ -17,6 +17,7 @@ export type EventRow = {
   visibility: "public" | "private";
   face_search_enabled: boolean;
   created_by: string;
+  updated_at: string;
 };
 
 export type PhotoRow = {
@@ -33,7 +34,7 @@ export type PhotoRow = {
 
 export type Participant = { user_id: string; role: "owner" | "contributor"; user: { full_name: string | null } | null };
 
-const EVENT_COLUMNS = "id, slug, name_mn, name_en, description_mn, description_en, event_date, location, status, visibility, face_search_enabled, created_by";
+const EVENT_COLUMNS = "id, slug, name_mn, name_en, description_mn, description_en, event_date, location, status, visibility, face_search_enabled, created_by, updated_at";
 
 export async function listEvents(): Promise<(EventRow & { photo_count: number })[]> {
   const supabase = await createClient();

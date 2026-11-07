@@ -8,16 +8,19 @@ import { LocaleSwitch } from "./locale-switch";
 
 const linkClass = "rounded-md px-3 py-2 text-sm text-zinc-700 transition-colors duration-200 hover:text-zinc-950";
 
-async function unreadCount(): Promise<number> {
+async function counts(): Promise<{ unread: number; cart: number }> {
   const supabase = await createClient();
-  const { count } = await supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null);
-  return count ?? 0;
+  const [n, c] = await Promise.all([
+    supabase.from("notifications").select("id", { count: "exact", head: true }).is("read_at", null),
+    supabase.from("cart_items").select("photo_id", { count: "exact", head: true }),
+  ]);
+  return { unread: n.count ?? 0, cart: c.count ?? 0 };
 }
 
 export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) {
   const user = await getCurrentUser();
   const role = user?.profile?.status === "active" ? user.profile.role : undefined;
-  const unread = user ? await unreadCount() : 0;
+  const { unread, cart } = user ? await counts() : { unread: 0, cart: 0 };
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
@@ -27,13 +30,18 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
         </Link>
 
         <nav aria-label="Main" className="no-scrollbar -mr-2 flex min-w-0 items-center gap-1 overflow-x-auto whitespace-nowrap">
-          <Link href={`/${locale}#photographers`} className={`${linkClass} hidden md:inline-block`}>{t.photographers}</Link>
+          <Link href={`/${locale}/events`} className={linkClass}>{t.events}</Link>
+          <Link href={`/${locale}#photographers`} className={`${linkClass} hidden lg:inline-block`}>{t.photographers}</Link>
           <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
 
           {user ? (
             <>
               {role === "admin" && <Link href={`/${locale}/admin`} className={linkClass}>{t.admin}</Link>}
               {role === "photographer" && <Link href={`/${locale}/photographer`} className={linkClass}>{t.dashboard}</Link>}
+              <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
+                {t.cart}
+                {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
+              </Link>
               <Link href={`/${locale}/notifications`} className={`${linkClass} inline-flex items-center gap-1.5`}>
                 {t.notifications}
                 {unread > 0 && (

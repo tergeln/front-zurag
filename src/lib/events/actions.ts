@@ -135,6 +135,19 @@ export async function setFaceSearch(formData: FormData) {
   revalidatePath(back);
 }
 
+/** Sets (or clears, when empty) the access code customers need for a private event. */
+export async function setAccessCode(formData: FormData) {
+  const locale = readLocale(formData);
+  const supabase = await requireSignedIn(locale);
+  const back = backPath(formData, locale);
+  const { error } = await supabase.rpc("set_event_access_code", {
+    p_event_id: String(formData.get("eventId")),
+    p_code: String(formData.get("code") ?? ""),
+  });
+  if (error) redirect(withError(back, error.message === "invalid_code" ? "invalidCode" : errorKey(error.message)));
+  revalidatePath(back);
+}
+
 function selectedIds(formData: FormData): string[] {
   return formData
     .getAll("photoIds")

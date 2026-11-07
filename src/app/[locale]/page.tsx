@@ -24,7 +24,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <p className="max-w-[58ch] text-lg leading-relaxed text-zinc-600">{t.lead}</p>
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href={`/${locale}/signup`}
+              href={`/${locale}/events`}
               className="rounded-lg bg-zinc-900 px-5 py-3 text-[15px] font-medium text-white transition-[transform,background-color] duration-200 hover:bg-zinc-800 active:scale-[0.98]"
             >
               {t.ctaFind}
