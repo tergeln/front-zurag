@@ -15,7 +15,8 @@ export default async function AdminPage({ params }: PageProps<"/[locale]/admin">
   const t = dict.admin.overview;
 
   const supabase = await createClient();
-  const [pending, active, audit] = await Promise.all([
+  const [users, pending, active, audit] = await Promise.all([
+    supabase.from("users").select("id", { count: "exact", head: true }),
     supabase.from("photographer_applications").select("id", { count: "exact", head: true }).eq("status", "submitted"),
     supabase.from("photographer_profiles").select("user_id", { count: "exact", head: true }).eq("status", "approved"),
     supabase
@@ -27,13 +28,14 @@ export default async function AdminPage({ params }: PageProps<"/[locale]/admin">
   ]);
 
   const stats = [
+    { label: t.users, value: users.count ?? 0, href: `/${locale}/admin/users` },
     { label: t.pendingApplications, value: pending.count ?? 0, href: `/${locale}/admin/applications` },
     { label: t.activePhotographers, value: active.count ?? 0, href: `/${locale}/admin/photographers` },
   ];
 
   return (
     <PageIntro title={dict.dashboard.adminTitle} lead={dict.dashboard.adminLead}>
-      <div className="grid max-w-2xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 sm:grid-cols-2">
+      <div className="grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 sm:grid-cols-3">
         {stats.map((s) => (
           <Link key={s.label} href={s.href} className="flex flex-col gap-1 bg-white p-6 transition-colors duration-200 hover:bg-zinc-50">
             <span className="font-mono text-3xl text-zinc-950">{s.value}</span>

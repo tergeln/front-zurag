@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function AdminNav({ items }: { items: { href: string; label: string }[] }) {
+/** Pill navigation for dashboard sections (admin, photographer studio). */
+export function SubNav({ label, items }: { label: string; items: { href: string; label: string }[] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Admin" className="mx-auto flex w-full max-w-7xl gap-1 overflow-x-auto px-4 pt-6 md:px-8">
+    <nav aria-label={label} className="no-scrollbar mx-auto flex w-full max-w-7xl gap-1 overflow-x-auto px-4 pt-6 md:px-8">
       {items.map((item) => {
         const active = pathname === item.href;
         return (

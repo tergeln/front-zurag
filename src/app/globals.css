@@ -19,6 +19,14 @@ body {
   color: var(--color-ink);
 }
 
+/* Horizontal scrollers (tab rows) stay scrollable without showing a scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 h1,
 h2,
 h3 {
