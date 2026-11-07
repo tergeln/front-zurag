@@ -38,6 +38,7 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
             <>
               {role === "admin" && <Link href={`/${locale}/admin`} className={linkClass}>{t.admin}</Link>}
               {role === "photographer" && <Link href={`/${locale}/photographer`} className={linkClass}>{t.dashboard}</Link>}
+              <Link href={`/${locale}/downloads`} className={linkClass}>{t.myPhotos}</Link>
               <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
                 {t.cart}
                 {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}

@@ -33,11 +33,18 @@ export async function presignPut(key: string, contentType: string, expiresIn = 9
   return signed.url;
 }
 
-/** A URL that lets the holder GET one object for `expiresIn` seconds. */
-export async function presignGet(key: string, expiresIn = 600): Promise<string> {
+/**
+ * A URL that lets the holder GET one object for `expiresIn` seconds.
+ * With `downloadAs`, the browser saves the file under that name instead of showing it.
+ */
+export async function presignGet(key: string, expiresIn = 600, downloadAs?: string): Promise<string> {
   const { client, base } = config();
   const url = new URL(objectUrl(base, key));
   url.searchParams.set("X-Amz-Expires", String(expiresIn));
+  if (downloadAs) {
+    const ascii = downloadAs.replace(/[^\w.\-]+/g, "_").slice(0, 120) || "photo.jpg";
+    url.searchParams.set("response-content-disposition", `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(downloadAs)}`);
+  }
   const signed = await client.sign(new Request(url, { method: "GET" }), { aws: { signQuery: true } });
   return signed.url;
 }
