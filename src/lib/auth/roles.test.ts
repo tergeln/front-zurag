@@ -1,5 +1,44 @@
 import { describe, expect, it } from "vitest";
-import { hasRole, safeNextPath } from "./roles";
+import { canSellPhotos, hasRole, parsePortfolioUrls, safeNextPath } from "./roles";
+
+describe("canSellPhotos", () => {
+  const photographer = { role: "photographer", status: "active" } as const;
+
+  it("allows an approved photographer", () => {
+    expect(canSellPhotos(photographer, "approved")).toBe(true);
+  });
+
+  it("blocks pending, rejected and suspended photographers", () => {
+    expect(canSellPhotos(photographer, "pending")).toBe(false);
+    expect(canSellPhotos(photographer, "rejected")).toBe(false);
+    expect(canSellPhotos(photographer, "suspended")).toBe(false);
+    expect(canSellPhotos(photographer, null)).toBe(false);
+  });
+
+  it("blocks a customer even if a profile row says approved", () => {
+    expect(canSellPhotos({ role: "customer", status: "active" }, "approved")).toBe(false);
+  });
+
+  it("blocks a suspended user account", () => {
+    expect(canSellPhotos({ role: "photographer", status: "suspended" }, "approved")).toBe(false);
+  });
+});
+
+describe("parsePortfolioUrls", () => {
+  it("accepts 1 to 5 https links, one per line", () => {
+    expect(parsePortfolioUrls("https://instagram.com/a\nhttps://behance.net/b")).toEqual([
+      "https://instagram.com/a",
+      "https://behance.net/b",
+    ]);
+  });
+
+  it("rejects empty input, http links, non-URLs and more than 5 links", () => {
+    expect(parsePortfolioUrls("   ")).toBeNull();
+    expect(parsePortfolioUrls("http://insecure.example")).toBeNull();
+    expect(parsePortfolioUrls("not a url")).toBeNull();
+    expect(parsePortfolioUrls(Array.from({ length: 6 }, (_, i) => `https://x.com/${i}`).join("\n"))).toBeNull();
+  });
+});
 
 describe("hasRole", () => {
   it("lets an active admin into admin pages", () => {

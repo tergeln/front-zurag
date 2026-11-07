@@ -93,7 +93,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             <h2 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{t.photographersTitle}</h2>
             <p className="leading-relaxed text-zinc-200">{t.photographersBody}</p>
             <Link
-              href={`/${locale}/signup`}
+              href={`/${locale}/photographer/apply`}
               className="w-fit rounded-lg bg-white px-5 py-3 text-[15px] font-medium text-zinc-900 transition-[transform,background-color] duration-200 hover:bg-zinc-100 active:scale-[0.98]"
             >
               {t.photographersCta}
