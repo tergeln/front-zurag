@@ -498,6 +498,7 @@ export const en: Dictionary = {
       referencePlaceholder: "Transfer reference / number",
       errors: { not_open: "This request was already decided.", not_approved: "Approve it first.", reference_required: "Enter the transfer reference.", generic: "Something went wrong." },
     },
+    navGroups: { overview: "Overview", content: "Events & photos", sales: "Sales", people: "People", system: "System" },
     nav: { overview: "Overview", events: "Events", photos: "Photos", orders: "Orders", revenue: "Revenue", payouts: "Payouts", applications: "Applications", photographers: "Photographers", users: "Users", settings: "Settings", audit: "Audit log" },
     users: {
       title: "Users",

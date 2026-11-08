@@ -496,6 +496,7 @@ export const mn = {
       referencePlaceholder: "Гүйлгээний утга / дугаар",
       errors: { not_open: "Энэ хүсэлт аль хэдийн шийдвэрлэгдсэн.", not_approved: "Эхлээд зөвшөөрнө үү.", reference_required: "Гүйлгээний утга оруулна уу.", generic: "Алдаа гарлаа." },
     },
+    navGroups: { overview: "Тойм", content: "Арга хэмжээ, зураг", sales: "Борлуулалт", people: "Хүмүүс", system: "Систем" },
     nav: { overview: "Тойм", events: "Арга хэмжээ", photos: "Зургууд", orders: "Захиалга", revenue: "Орлого", payouts: "Төлбөр олголт", applications: "Өргөдлүүд", photographers: "Гэрэл зурагчид", users: "Хэрэглэгчид", settings: "Тохиргоо", audit: "Үйлдлийн бүртгэл" },
     users: {
       title: "Хэрэглэгчид",
