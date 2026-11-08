@@ -41,7 +41,7 @@ export async function listEvents(): Promise<(EventRow & { photo_count: number })
   const supabase = await createClient();
   const { data } = await supabase
     .from("events")
-    .select(`${EVENT_COLUMNS}, photos(count)`)
+    .select(`${EVENT_COLUMNS}, photos!photos_event_id_fkey(count)`)
     .neq("photos.status", "deleted")
     .order("event_date", { ascending: false })
     .limit(200);
