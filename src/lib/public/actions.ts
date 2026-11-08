@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
-import { getEventCodes, rememberEventCode } from "./codes";
+import { getSearchToken, rememberEventCode } from "./codes";
 
 function readLocale(formData: FormData): Locale {
   const v = String(formData.get("locale") ?? "");
@@ -36,7 +36,7 @@ export async function addToCart(photoId: string): Promise<CartActionResult> {
   if (!isUuid(photoId)) return { ok: false, error: "not_available" };
   if (!(await getCurrentUser())) return { ok: false, error: "login" };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("add_to_cart", { p_photo_id: photoId, p_codes: await getEventCodes() });
+  const { error } = await supabase.rpc("add_to_cart", { p_photo_id: photoId, p_token: await getSearchToken() });
   if (error) return { ok: false, error: error.message === "not_available" || error.message === "cart_full" ? error.message : "generic" };
   revalidatePath("/", "layout"); // header cart count
   return { ok: true };
@@ -55,22 +55,4 @@ export async function removeFromCart(photoId: string): Promise<CartActionResult>
 /** Form version for the cart page's remove buttons. */
 export async function removeFromCartForm(formData: FormData) {
   await removeFromCart(String(formData.get("photoId") ?? ""));
-}
-
-export async function giveBiometricConsent(formData: FormData) {
-  const locale = readLocale(formData);
-  const back = String(formData.get("back") ?? `/${locale}/events`);
-  const safeBack = back.startsWith(`/${locale}/events/`) ? back : `/${locale}/events`;
-  if (formData.get("agree") !== "on") redirect(`${safeBack}?consent=required`);
-  const supabase = await createClient();
-  await supabase.rpc("record_biometric_consent");
-  revalidatePath(safeBack); // the page must re-render without the consent form
-  redirect(safeBack);
-}
-
-export async function withdrawBiometricConsent(formData: FormData) {
-  const locale = readLocale(formData);
-  const supabase = await createClient();
-  await supabase.rpc("withdraw_biometric_consent");
-  revalidatePath(`/${locale}/account`);
 }

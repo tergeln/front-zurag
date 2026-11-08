@@ -1,16 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getEventCodes } from "@/lib/public/codes";
+import { getSearchToken } from "@/lib/public/codes";
 import { presignGet } from "@/lib/r2";
 
 /**
  * GET /api/photos/{id}/image?variant=thumb|preview
  * Redirects to a short-lived signed URL for the watermarked thumbnail or
  * preview. Originals are never served here.
- * Anyone may see photos of published events they can access (public, or
- * unlocked with the access code); admins and owners also see their own
- * photos before the event is published.
+ * Customers see only photos their selfie search matched in this browser,
+ * photos in their cart, and photos they bought. Admins see every photo and
+ * photographers their own.
  */
 export async function GET(request: NextRequest, { params }: RouteContext<"/api/photos/[id]/image">) {
   const { id } = await params;
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: RouteContext<"/api/p
   const variant = request.nextUrl.searchParams.get("variant") === "preview" ? "preview" : "thumb";
   const supabase = await createClient();
 
-  const { data: publicKey } = await supabase.rpc("public_photo_image_key", { p_photo_id: id, p_variant: variant, p_codes: await getEventCodes() });
+  const { data: publicKey } = await supabase.rpc("public_photo_image_key", { p_photo_id: id, p_variant: variant, p_token: await getSearchToken() });
   let key = typeof publicKey === "string" ? publicKey : null;
 
   if (!key && (await getCurrentUser())) {

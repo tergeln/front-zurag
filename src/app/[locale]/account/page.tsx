@@ -5,8 +5,6 @@ import { requireUser } from "@/lib/auth/session";
 import { getPhotographerProfile } from "@/lib/auth/photographer";
 import { PageIntro } from "@/components/layout/page-intro";
 import { textLink } from "@/components/ui/styles";
-import { hasBiometricConsent } from "@/lib/public/queries";
-import { withdrawBiometricConsent } from "@/lib/public/actions";
 import { deleteMyAccount } from "@/lib/account/actions";
 import { ProfileForm } from "./profile-form";
 
@@ -18,7 +16,7 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
   const deleteError = DELETE_ERRORS.find((k) => k === deleteParam);
   const del = getDictionary(locale).deleteAccount;
   const user = await requireUser(locale, `/${locale}/account`);
-  const [photographer, consent] = await Promise.all([getPhotographerProfile(user.id), hasBiometricConsent()]);
+  const photographer = await getPhotographerProfile(user.id);
   const t = getDictionary(locale).account;
   const role = user.profile?.role ?? "customer";
 
@@ -45,12 +43,6 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
 
       <p className="max-w-[60ch] rounded-2xl border border-dashed border-zinc-300 p-6 leading-relaxed text-zinc-600">{t.emptyPurchases}</p>
 
-      <form action={withdrawBiometricConsent} className="flex max-w-[60ch] flex-col gap-2 border-t border-zinc-200 pt-6">
-        <input type="hidden" name="locale" value={locale} />
-        <h2 className="text-lg font-semibold text-zinc-950">{t.biometricTitle}</h2>
-        <p className="leading-relaxed text-zinc-600">{consent ? t.biometricOn : t.biometricOff}</p>
-        {consent && <button type="submit" className={`${textLink} w-fit text-sm`}>{t.biometricWithdraw}</button>}
-      </form>
 
       {role !== "admin" && (
         <form action={deleteMyAccount} className="flex max-w-[60ch] flex-col gap-3 rounded-2xl border border-red-200 bg-red-50/40 p-6">

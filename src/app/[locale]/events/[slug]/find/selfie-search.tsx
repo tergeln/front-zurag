@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/mn";
-import type { PublicPhotoDetail } from "@/lib/public/queries";
+import type { MatchedPhoto } from "@/lib/public/queries";
 import { PhotoGrid } from "@/components/gallery/photo-grid";
 import { primaryButton, secondaryButton } from "@/components/ui/styles";
 
@@ -13,17 +13,20 @@ type Props = {
   t: Dictionary["find"];
   gallery: Dictionary["gallery"];
   cartIds: string[];
+  loggedIn: boolean;
   loginHref: string;
+  initialPhotos: MatchedPhoto[]; // this browser's matches from the last 24 hours
 };
 
 type State =
   | { kind: "idle" }
-  | { kind: "searching"; preview: string }
-  | { kind: "done"; preview: string; photos: (PublicPhotoDetail & { similarity: number })[] }
+  | { kind: "searching"; preview?: string }
+  | { kind: "done"; preview?: string; photos: MatchedPhoto[] }
   | { kind: "error"; preview?: string; message: string };
 
-export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loginHref }: Props) {
-  const [state, setState] = useState<State>({ kind: "idle" });
+export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loggedIn, loginHref, initialPhotos }: Props) {
+  const [state, setState] = useState<State>(initialPhotos.length ? { kind: "done", photos: initialPhotos } : { kind: "idle" });
+  const [consent, setConsent] = useState(false);
   const input = useRef<HTMLInputElement>(null);
 
   async function search(file: File) {
@@ -37,6 +40,7 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loginHref }
     const body = new FormData();
     body.append("eventId", eventId);
     body.append("image", file);
+    body.append("consent", "on");
     try {
       const res = await fetch("/api/search", { method: "POST", body });
       const json = await res.json();
@@ -75,7 +79,7 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loginHref }
           />
           <button
             type="button"
-            disabled={state.kind === "searching"}
+            disabled={state.kind === "searching" || !consent}
             onClick={() => input.current?.click()}
             className={`${state.kind === "done" ? secondaryButton : primaryButton} w-fit`}
           >
@@ -83,6 +87,18 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loginHref }
           </button>
           <p className="text-sm text-zinc-500">{t.hint}</p>
         </div>
+      </div>
+
+      <div className="flex max-w-2xl flex-col gap-3">
+        <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm leading-relaxed text-zinc-600">
+          {t.consentPoints.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+        <label className="flex items-start gap-3 text-sm leading-relaxed text-zinc-800">
+          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-zinc-900" />
+          <span>{t.consentCheck}</span>
+        </label>
       </div>
 
       {state.kind === "error" && <p role="alert" className="text-red-700">{state.message}</p>}
@@ -94,7 +110,7 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loginHref }
             <p className="text-sm text-zinc-600">{state.photos.length ? t.disclaimer : t.none}</p>
           </div>
           {state.photos.length > 0 && (
-            <PhotoGrid locale={locale} t={gallery} photos={state.photos} cart={new Set(cartIds)} loggedIn loginHref={loginHref} />
+            <PhotoGrid locale={locale} t={gallery} photos={state.photos} cart={new Set(cartIds)} loggedIn={loggedIn} loginHref={loginHref} />
           )}
         </section>
       )}

@@ -13,7 +13,7 @@ import { FaceSearchToggle } from "@/components/events/face-search-toggle";
 import { AccessCodeForm } from "@/components/events/access-code-form";
 import { textLink } from "@/components/ui/styles";
 
-const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "needAttestation", "invalidCode", "generic"];
+const ERROR_KEYS: EventErrorKey[] = ["invalidName", "invalidDate", "forbidden", "notFound", "notPhotographer", "invalidPrice", "needAttestation", "invalidCode", "faceSearchRequired", "unpublishFirst", "generic"];
 
 export default async function StudioEventPage({ params, searchParams }: PageProps<"/[locale]/photographer/events/[id]">) {
   const { locale: rawLocale, id } = await params;

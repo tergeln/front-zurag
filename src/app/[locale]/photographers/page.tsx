@@ -16,13 +16,7 @@ export default async function PhotographersPage({ params }: PageProps<"/[locale]
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((p) => (
             <li key={p.slug}>
-              <Link href={`/${locale}/photographers/${p.slug}`} className="group flex flex-col gap-3">
-                <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-zinc-200">
-                  {p.cover_photo_id && (
-                    // eslint-disable-next-line @next/next/no-img-element -- signed, short-lived R2 URL via redirect
-                    <img src={`/api/photos/${p.cover_photo_id}/image?variant=preview`} alt="" loading="lazy" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
-                  )}
-                </div>
+              <Link href={`/${locale}/photographers/${p.slug}`} className="flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-5 transition-colors duration-200 hover:border-zinc-400">
                 <div className="flex flex-col gap-1">
                   <h2 className="text-lg font-semibold tracking-tight text-zinc-950">{p.display_name}</h2>
                   <p className="text-sm text-zinc-500">{t.photos.replace("{n}", String(p.photo_count))}</p>

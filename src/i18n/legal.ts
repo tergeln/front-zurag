@@ -122,7 +122,8 @@ const privacy: Record<Locale, LegalDoc> = {
         body: [
           "Арга хэмжээний зургуудаас царайн тоон дүрслэл (embedding) гаргаж, зөвхөн тухайн арга хэмжээн дотор хайлт хийхэд ашиглана.",
           "Таны селфиг зөвхөн санах ойд боловсруулж, хайлт дуусмагц устгана. Селфи хэзээ ч хадгалагдахгүй.",
-          "Селфи хайлт хийхээс өмнө таны зөвшөөрлийг асууна. Зөвшөөрлөө «Миний бүртгэл» хэсгээс хэдийд ч цуцалж болно.",
+          "Селфи хайлт бүрийн өмнө таны зөвшөөрлийг асууна. Хайлтад бүртгэл шаардлагагүй.",
+          "Зургууд нийтэд харагдахгүй. Таны селфитэй тохирсон зургууд зөвхөн таны хөтөч дээр 24 цагийн турш харагдана. Хайлтын бүртгэлд IP хаягийг шууд биш, нууцлагдсан (hash) хэлбэрээр хадгалдаг.",
           "Царайн өгөгдлийг {days} хоногийн дараа автоматаар устгана. Зураг устгагдвал холбогдох царайн өгөгдөл тэр даруй устана.",
         ],
       },
@@ -166,7 +167,8 @@ const privacy: Record<Locale, LegalDoc> = {
         body: [
           "We turn faces in event photos into numeric descriptions (embeddings) and use them only to search within that one event.",
           "Your selfie is processed in memory and discarded as soon as the search is done. It is never stored.",
-          "We ask for your consent before a selfie search. You can withdraw it at any time under My account.",
+          "We ask for your consent before every selfie search. Searching needs no account.",
+          "Photos are not public. The photos that match your selfie are visible only in your browser, for 24 hours. The search log keeps your network address only in hashed form, never the address itself.",
           "Face data is deleted automatically after {days} days. When a photo is deleted, its face data is deleted at once.",
         ],
       },

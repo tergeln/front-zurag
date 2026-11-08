@@ -46,6 +46,10 @@ function errorKey(message: string): EventErrorKey {
       return "notPhotographer";
     case "invalid_price":
       return "invalidPrice";
+    case "face_search_required":
+      return "faceSearchRequired";
+    case "unpublish_first":
+      return "unpublishFirst";
     default:
       return "generic";
   }
