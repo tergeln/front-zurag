@@ -52,7 +52,8 @@ export function LocaleSwitch({ locale, label }: { locale: Locale; label: string 
             <span>{l.toUpperCase()}</span>
           </>
         );
-        const base = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide";
+        // Both halves are the same width, so only the highlight moves.
+        const base = "inline-flex w-16 items-center justify-center gap-1.5 rounded-full py-1 text-xs font-semibold tracking-wide";
         if (l === locale) {
           return (
             <span key={l} aria-current="true" className={`${base} bg-zinc-900 text-white`}>

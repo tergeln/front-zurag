@@ -40,12 +40,21 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
     </form>
   );
 
+  // Language and theme always sit at the far right end, so switching language
+  // (which changes the width of the menu words) never moves them.
+  const controls = (
+    <div className="flex shrink-0 items-center gap-2">
+      <LocaleSwitch locale={locale} label={t.language} />
+      <ThemeToggle label={t.theme} />
+    </div>
+  );
+
   // Admins and photographers: one bar with only their own pages.
   if (staff) {
     return (
       <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
-          <Link href={`/${locale}/${role === "admin" ? "admin" : "photographer"}`} className="text-lg font-semibold tracking-tight text-zinc-950">
+          <Link href={`/${locale}/${role === "admin" ? "admin" : "photographer"}`} className="mr-auto shrink-0 text-lg font-semibold tracking-tight text-zinc-950">
             Zurag<span className="text-[var(--color-accent)]">.</span>
           </Link>
           <StaffNav
@@ -54,13 +63,12 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
             utilities={
               <>
                 {notificationsLink}
-                <LocaleSwitch locale={locale} label={t.language} />
-              <ThemeToggle label={t.theme} />
                 <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
                 {logoutForm}
               </>
             }
           />
+          {controls}
         </div>
       </header>
     );
@@ -69,7 +77,7 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
-        <Link href={`/${locale}`} className="text-lg font-semibold tracking-tight text-zinc-950">
+        <Link href={`/${locale}`} className="mr-auto shrink-0 text-lg font-semibold tracking-tight text-zinc-950">
           Zurag<span className="text-[var(--color-accent)]">.</span>
         </Link>
 
@@ -85,15 +93,11 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
                 {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
               </Link>
               {notificationsLink}
-              <LocaleSwitch locale={locale} label={t.language} />
-              <ThemeToggle label={t.theme} />
               <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
               {logoutForm}
             </>
           ) : (
             <>
-              <LocaleSwitch locale={locale} label={t.language} />
-              <ThemeToggle label={t.theme} />
               <Link href={`/${locale}/login`} className={linkClass}>{t.login}</Link>
               <Link
                 href={`/${locale}/signup`}
@@ -104,6 +108,7 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
             </>
           )}
         </nav>
+        {controls}
       </div>
     </header>
   );
