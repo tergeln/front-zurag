@@ -27,7 +27,9 @@ type State =
 export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loggedIn, loginHref, initialPhotos }: Props) {
   const [state, setState] = useState<State>(initialPhotos.length ? { kind: "done", photos: initialPhotos } : { kind: "idle" });
   const [consent, setConsent] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const camera = useRef<HTMLInputElement>(null);
+  const library = useRef<HTMLInputElement>(null);
 
   async function search(file: File) {
     if (file.size > 10 * 1024 * 1024) {
@@ -56,39 +58,17 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loggedIn, l
   }
 
   const preview = state.kind === "idle" ? undefined : state.preview;
+  const busy = state.kind === "searching";
+  const disabled = busy || !consent;
+
+  function pick(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (f) void search(f);
+    e.target.value = "";
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col items-start gap-4 rounded-2xl border border-zinc-200 bg-white p-6 sm:flex-row sm:items-center">
-        <div className="size-24 shrink-0 overflow-hidden rounded-full bg-zinc-100">
-          {/* eslint-disable-next-line @next/next/no-img-element -- local preview of the chosen selfie */}
-          {preview && <img src={preview} alt="" className="size-full object-cover" />}
-        </div>
-        <div className="flex flex-col gap-2">
-          <input
-            ref={input}
-            type="file"
-            accept="image/*"
-            capture="user"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void search(f);
-              e.target.value = "";
-            }}
-          />
-          <button
-            type="button"
-            disabled={state.kind === "searching" || !consent}
-            onClick={() => input.current?.click()}
-            className={`${state.kind === "done" ? secondaryButton : primaryButton} w-fit`}
-          >
-            {state.kind === "searching" ? t.searching : state.kind === "done" ? t.again : t.choose}
-          </button>
-          <p className="text-sm text-zinc-500">{t.hint}</p>
-        </div>
-      </div>
-
       <div className="flex max-w-2xl flex-col gap-3">
         <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm leading-relaxed text-zinc-600">
           {t.consentPoints.map((p) => (
@@ -99,6 +79,42 @@ export function SelfieSearch({ locale, eventId, t, gallery, cartIds, loggedIn, l
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-zinc-900" />
           <span>{t.consentCheck}</span>
         </label>
+      </div>
+
+      <div
+        className={`flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${dragging ? "border-zinc-900 bg-zinc-50" : "border-zinc-300 bg-white"}`}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          const f = e.dataTransfer.files?.[0];
+          if (!f || busy) return;
+          if (!consent) setState({ kind: "error", message: t.errors.no_consent });
+          else void search(f);
+        }}
+      >
+        <div className="size-24 shrink-0 overflow-hidden rounded-full bg-zinc-100">
+          {/* eslint-disable-next-line @next/next/no-img-element -- local preview of the chosen selfie */}
+          {preview && <img src={preview} alt="" className="size-full object-cover" />}
+        </div>
+        {/* Camera: opens the front camera on phones. Library: picks an existing photo. */}
+        <input ref={camera} type="file" accept="image/*" capture="user" className="hidden" onChange={pick} />
+        <input ref={library} type="file" accept="image/*" className="hidden" onChange={pick} />
+        <div className="flex flex-wrap justify-center gap-3">
+          <button type="button" disabled={disabled} onClick={() => camera.current?.click()} className={primaryButton}>
+            {busy ? t.searching : t.takeSelfie}
+          </button>
+          <button type="button" disabled={disabled} onClick={() => library.current?.click()} className={secondaryButton}>
+            {t.fromLibrary}
+          </button>
+        </div>
+        <p className="text-sm text-zinc-500">{t.dropHint}</p>
+        <p className="text-sm text-zinc-500">{t.hint}</p>
+        {!consent && <p className="text-sm font-medium text-zinc-700">{t.consentFirst}</p>}
       </div>
 
       {state.kind === "error" && <p role="alert" className="text-red-700">{state.message}</p>}
