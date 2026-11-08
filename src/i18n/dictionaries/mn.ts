@@ -12,9 +12,8 @@ export const mn = {
     signup: "Бүртгүүлэх",
     logout: "Гарах",
     account: "Миний бүртгэл",
-    admin: "Админ",
-    dashboard: "Самбар",
     notifications: "Мэдэгдэл",
+    menu: "Цэс",
     language: "English",
   },
   gallery: {

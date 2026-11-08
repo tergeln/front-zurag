@@ -14,9 +14,8 @@ export const en: Dictionary = {
     signup: "Sign up",
     logout: "Log out",
     account: "My account",
-    admin: "Admin",
-    dashboard: "Dashboard",
     notifications: "Notifications",
+    menu: "Menu",
     language: "Монгол",
   },
   gallery: {

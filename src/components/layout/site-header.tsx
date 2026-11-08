@@ -4,7 +4,10 @@ import type { Dictionary } from "@/i18n/dictionaries/mn";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/[locale]/(auth)/actions";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { LocaleSwitch } from "./locale-switch";
+import { StaffNav } from "./staff-nav";
+import { staffNavGroups } from "./staff-nav-groups";
 
 const linkClass = "rounded-md px-3 py-2 text-sm text-zinc-700 transition-colors duration-200 hover:text-zinc-950";
 
@@ -23,6 +26,44 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
   const staff = role === "admin" || role === "photographer";
   const { unread, cart } = user ? await counts() : { unread: 0, cart: 0 };
 
+  const notificationsLink = (
+    <Link href={`/${locale}/notifications`} className={`${linkClass} inline-flex items-center gap-1.5`}>
+      {t.notifications}
+      {unread > 0 && <span className="rounded-full bg-[var(--color-accent)] px-1.5 font-mono text-[11px] leading-5 text-white">{unread}</span>}
+    </Link>
+  );
+  const logoutForm = (
+    <form action={signOut}>
+      <input type="hidden" name="locale" value={locale} />
+      <button type="submit" className={linkClass}>{t.logout}</button>
+    </form>
+  );
+
+  // Admins and photographers: one bar with only their own pages.
+  if (staff) {
+    return (
+      <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
+          <Link href={`/${locale}/${role === "admin" ? "admin" : "photographer"}`} className="text-lg font-semibold tracking-tight text-zinc-950">
+            Zurag<span className="text-[var(--color-accent)]">.</span>
+          </Link>
+          <StaffNav
+            groups={staffNavGroups(role, locale, getDictionary(locale))}
+            menuLabel={t.menu}
+            utilities={
+              <>
+                {notificationsLink}
+                <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
+                <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
+                {logoutForm}
+              </>
+            }
+          />
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
@@ -31,35 +72,20 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
         </Link>
 
         <nav aria-label="Main" className="no-scrollbar -mr-2 flex min-w-0 items-center gap-1 overflow-x-auto whitespace-nowrap">
-          {/* Admins and photographers see only their own tools; the shop links are for customers. */}
-          {!staff && <Link href={`/${locale}/events`} className={linkClass}>{t.events}</Link>}
-          {!staff && <Link href={`/${locale}#photographers`} className={`${linkClass} hidden lg:inline-block`}>{t.photographers}</Link>}
-          {role === "admin" && <Link href={`/${locale}/admin`} className={linkClass}>{t.admin}</Link>}
-          {role === "photographer" && <Link href={`/${locale}/photographer`} className={linkClass}>{t.dashboard}</Link>}
+          <Link href={`/${locale}/events`} className={linkClass}>{t.events}</Link>
+          <Link href={`/${locale}#photographers`} className={`${linkClass} hidden lg:inline-block`}>{t.photographers}</Link>
 
           {user ? (
             <>
-              {!staff && (
-                <>
-                  <Link href={`/${locale}/downloads`} className={linkClass}>{t.myPhotos}</Link>
-                  <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
-                    {t.cart}
-                    {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
-                  </Link>
-                </>
-              )}
-              <Link href={`/${locale}/notifications`} className={`${linkClass} inline-flex items-center gap-1.5`}>
-                {t.notifications}
-                {unread > 0 && (
-                  <span className="rounded-full bg-[var(--color-accent)] px-1.5 font-mono text-[11px] leading-5 text-white">{unread}</span>
-                )}
+              <Link href={`/${locale}/downloads`} className={linkClass}>{t.myPhotos}</Link>
+              <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
+                {t.cart}
+                {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
               </Link>
+              {notificationsLink}
               <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
               <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
-              <form action={signOut}>
-                <input type="hidden" name="locale" value={locale} />
-                <button type="submit" className={linkClass}>{t.logout}</button>
-              </form>
+              {logoutForm}
             </>
           ) : (
             <>
