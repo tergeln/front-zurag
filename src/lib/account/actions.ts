@@ -57,6 +57,45 @@ export async function setNewPassword(_prev: NewPasswordState, formData: FormData
   return { done: true };
 }
 
+// ---------------------------------------------------------------- email verification (photographers)
+
+export type EmailCodeState = { sent?: boolean; verified?: boolean; error?: "rateLimit" | "wrongCode" | "generic" } | undefined;
+
+/**
+ * Customers never verify their email. Photographers must, before applying or
+ * accepting an invitation: we email a one-time code (Supabase "Magic Link"
+ * email, whose template shows {{ .Token }}) and they type it in.
+ */
+export async function sendEmailCode(_prev: EmailCodeState, formData: FormData): Promise<EmailCodeState> {
+  const v = String(formData.get("locale") ?? "");
+  const locale = isLocale(v) ? v : defaultLocale;
+  const user = await getCurrentUser();
+  if (!user?.email) redirect(`/${locale}/login`);
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithOtp({ email: user.email, options: { shouldCreateUser: false } });
+  if (error) return { error: error.status === 429 || error.code?.startsWith("over_") ? "rateLimit" : "generic" };
+  return { sent: true };
+}
+
+export async function verifyEmailCode(_prev: EmailCodeState, formData: FormData): Promise<EmailCodeState> {
+  const v = String(formData.get("locale") ?? "");
+  const locale = isLocale(v) ? v : defaultLocale;
+  const user = await getCurrentUser();
+  if (!user?.email) redirect(`/${locale}/login`);
+  const code = String(formData.get("code") ?? "").replace(/\s/g, "");
+  if (!/^\d{6,10}$/.test(code)) return { sent: true, error: "wrongCode" };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.verifyOtp({ email: user.email, token: code, type: "email" });
+  if (error || data.user?.id !== user.id) return { sent: true, error: error?.status === 429 ? "rateLimit" : "wrongCode" };
+
+  // The code proves this person reads this inbox. Only the server key may set the flag.
+  const { error: saveError } = await createAdminClient().from("users").update({ email_verified_at: new Date().toISOString() }).eq("id", user.id);
+  if (saveError) return { sent: true, error: "generic" };
+  revalidatePath(`/${locale}`, "layout");
+  return { verified: true };
+}
+
 // ---------------------------------------------------------------- profile
 
 export type ProfileState = { error?: "invalidName" | "invalidPhone" | "generic"; saved?: boolean } | undefined;

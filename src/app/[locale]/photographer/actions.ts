@@ -24,6 +24,7 @@ const RPC_ERRORS: Record<string, ApplyErrorKey> = {
   invalid_name: "invalidName",
   invalid_bio: "invalidBio",
   invalid_portfolio: "invalidPortfolio",
+  email_not_verified: "emailNotVerified",
 };
 
 export async function submitApplication(_prev: ApplyState, formData: FormData): Promise<ApplyState> {
@@ -103,7 +104,10 @@ export async function acceptInvitation(formData: FormData) {
 
   const supabase = await createClient();
   const { error } = await supabase.rpc("accept_photographer_invitation", { p_token: token });
-  if (error) redirect(`${back}?error=${error.message === "wrong_account" ? "wrongAccount" : "invalid"}`);
+  if (error) {
+    const key = error.message === "wrong_account" ? "wrongAccount" : error.message === "email_not_verified" ? "emailNotVerified" : "invalid";
+    redirect(`${back}?error=${key}`);
+  }
 
   redirect(`/${locale}/photographer`);
 }

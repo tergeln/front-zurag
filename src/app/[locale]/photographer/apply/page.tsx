@@ -4,6 +4,7 @@ import { resolveLocale } from "@/i18n/resolve";
 import { requireUser } from "@/lib/auth/session";
 import { getLatestApplication, getPhotographerProfile } from "@/lib/auth/photographer";
 import { PageIntro } from "@/components/layout/page-intro";
+import { EmailVerify } from "@/components/account/email-verify";
 import { ApplyForm } from "./apply-form";
 
 export default async function ApplyPage({ params }: PageProps<"/[locale]/photographer/apply">) {
@@ -19,6 +20,10 @@ export default async function ApplyPage({ params }: PageProps<"/[locale]/photogr
   const t = dict.photographer;
   return (
     <PageIntro title={t.applyTitle} lead={t.applyLead}>
+      {/* Photographers must prove they own their email before applying. */}
+      {!user.profile?.email_verified_at ? (
+        <EmailVerify locale={locale} email={user.email ?? ""} t={dict.verifyEmail} />
+      ) : (
       <ApplyForm
         locale={locale}
         t={t}
@@ -31,6 +36,7 @@ export default async function ApplyPage({ params }: PageProps<"/[locale]/photogr
           portfolio: profile?.portfolio_urls.join("\n") ?? "",
         }}
       />
+      )}
     </PageIntro>
   );
 }
