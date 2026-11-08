@@ -20,6 +20,7 @@ async function counts(): Promise<{ unread: number; cart: number }> {
 export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary["nav"] }) {
   const user = await getCurrentUser();
   const role = user?.profile?.status === "active" ? user.profile.role : undefined;
+  const staff = role === "admin" || role === "photographer";
   const { unread, cart } = user ? await counts() : { unread: 0, cart: 0 };
 
   return (
@@ -30,25 +31,30 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
         </Link>
 
         <nav aria-label="Main" className="no-scrollbar -mr-2 flex min-w-0 items-center gap-1 overflow-x-auto whitespace-nowrap">
-          <Link href={`/${locale}/events`} className={linkClass}>{t.events}</Link>
-          <Link href={`/${locale}#photographers`} className={`${linkClass} hidden lg:inline-block`}>{t.photographers}</Link>
-          <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
+          {/* Admins and photographers see only their own tools; the shop links are for customers. */}
+          {!staff && <Link href={`/${locale}/events`} className={linkClass}>{t.events}</Link>}
+          {!staff && <Link href={`/${locale}#photographers`} className={`${linkClass} hidden lg:inline-block`}>{t.photographers}</Link>}
+          {role === "admin" && <Link href={`/${locale}/admin`} className={linkClass}>{t.admin}</Link>}
+          {role === "photographer" && <Link href={`/${locale}/photographer`} className={linkClass}>{t.dashboard}</Link>}
 
           {user ? (
             <>
-              {role === "admin" && <Link href={`/${locale}/admin`} className={linkClass}>{t.admin}</Link>}
-              {role === "photographer" && <Link href={`/${locale}/photographer`} className={linkClass}>{t.dashboard}</Link>}
-              <Link href={`/${locale}/downloads`} className={linkClass}>{t.myPhotos}</Link>
-              <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
-                {t.cart}
-                {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
-              </Link>
+              {!staff && (
+                <>
+                  <Link href={`/${locale}/downloads`} className={linkClass}>{t.myPhotos}</Link>
+                  <Link href={`/${locale}/cart`} className={`${linkClass} inline-flex items-center gap-1.5`}>
+                    {t.cart}
+                    {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
+                  </Link>
+                </>
+              )}
               <Link href={`/${locale}/notifications`} className={`${linkClass} inline-flex items-center gap-1.5`}>
                 {t.notifications}
                 {unread > 0 && (
                   <span className="rounded-full bg-[var(--color-accent)] px-1.5 font-mono text-[11px] leading-5 text-white">{unread}</span>
                 )}
               </Link>
+              <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
               <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
               <form action={signOut}>
                 <input type="hidden" name="locale" value={locale} />
@@ -57,6 +63,7 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
             </>
           ) : (
             <>
+              <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
               <Link href={`/${locale}/login`} className={linkClass}>{t.login}</Link>
               <Link
                 href={`/${locale}/signup`}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canSellPhotos, hasRole, parsePortfolioUrls, safeNextPath } from "./roles";
+import { canSellPhotos, hasRole, homePath, parsePortfolioUrls, safeNextPath } from "./roles";
 
 describe("canSellPhotos", () => {
   const photographer = { role: "photographer", status: "active" } as const;
@@ -78,5 +78,14 @@ describe("safeNextPath", () => {
     expect(safeNextPath("//evil.example", "/mn")).toBe("/mn");
     expect(safeNextPath("/\\evil.example", "/mn")).toBe("/mn");
     expect(safeNextPath(null, "/mn")).toBe("/mn");
+  });
+});
+
+describe("homePath", () => {
+  it("sends each role to its own start page", () => {
+    expect(homePath("admin", "mn")).toBe("/mn/admin");
+    expect(homePath("photographer", "en")).toBe("/en/photographer");
+    expect(homePath("customer", "mn")).toBe("/mn/account");
+    expect(homePath(undefined, "mn")).toBe("/mn/account");
   });
 });

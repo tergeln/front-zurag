@@ -50,3 +50,10 @@ export function safeNextPath(next: string | null | undefined, fallback: string):
   if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
   return next;
 }
+
+/** Where each role lands after logging in (when no other page was asked for). */
+export function homePath(role: Role | undefined, locale: string): string {
+  if (role === "admin") return `/${locale}/admin`;
+  if (role === "photographer") return `/${locale}/photographer`;
+  return `/${locale}/account`;
+}

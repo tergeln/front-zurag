@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isLocale, defaultLocale, type Locale } from "@/i18n/config";
-import { safeNextPath } from "@/lib/auth/roles";
+import { homePath, safeNextPath, type Role } from "@/lib/auth/roles";
 import type { Dictionary } from "@/i18n/dictionaries/mn";
 
 export type AuthErrorKey = keyof Dictionary["auth"]["errors"];
@@ -43,10 +43,12 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   if (!EMAIL_RE.test(email) || !password) return { error: "invalid", email };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: mapError(error.code), email };
 
-  redirect(safeNextPath(String(formData.get("next") ?? ""), `/${locale}/account`));
+  // Admins and photographers land on their dashboard, customers on their account.
+  const { data: profile } = await supabase.from("users").select("role").eq("id", data.user.id).maybeSingle<{ role: Role }>();
+  redirect(safeNextPath(String(formData.get("next") ?? ""), homePath(profile?.role, locale)));
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {
