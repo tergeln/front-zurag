@@ -16,7 +16,8 @@ export const en: Dictionary = {
     account: "My account",
     notifications: "Notifications",
     menu: "Menu",
-    language: "Монгол",
+    language: "Language / Хэл сонгох",
+    theme: "Light / dark mode",
   },
   gallery: {
     title: "Events",

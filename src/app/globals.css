@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-/* Light theme only (spec: clean light theme). One neutral family (zinc) + one accent. */
+/* One neutral family (zinc) + one accent, in a light and a dark theme. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -12,6 +14,49 @@
 
 html {
   scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+/*
+ * Dark theme: <html data-theme="dark"> (set before the page draws, see
+ * lib/theme.ts). Instead of a dark: class on every element, the colours the
+ * site uses are redefined: the grey scale is flipped (so dark text becomes
+ * light, white cards become dark, black buttons become light), and the
+ * message colours get lighter shades that read well on dark.
+ */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #0e0e10;
+  --color-ink: #f4f4f5;
+  --color-accent: #e0855c;
+  --color-accent-strong: #eb9a74;
+  --color-white: #18181b;
+  --color-black: #ffffff;
+  --color-zinc-50: #1d1d21;
+  --color-zinc-100: #27272a;
+  --color-zinc-200: #34343a;
+  --color-zinc-300: #46464e;
+  --color-zinc-400: #71717a;
+  --color-zinc-500: #a1a1aa;
+  --color-zinc-600: #b6b6be;
+  --color-zinc-700: #d4d4d8;
+  --color-zinc-800: #e4e4e7;
+  --color-zinc-900: #f4f4f5;
+  --color-zinc-950: #fafafa;
+  --color-red-50: #2b1515;
+  --color-red-200: #5f2626;
+  --color-red-300: #7f2f2f;
+  --color-red-700: #f87171;
+  --color-emerald-50: #0f2a20;
+  --color-emerald-200: #1b4d38;
+  --color-emerald-300: #22654a;
+  --color-emerald-700: #34d399;
+  --color-emerald-800: #6ee7b7;
+  --color-emerald-900: #a7f3d0;
+  --color-amber-50: #2a2110;
+  --color-amber-200: #5c4615;
+  --color-amber-700: #fbbf24;
+  --color-sky-700: #38bdf8;
 }
 
 body {

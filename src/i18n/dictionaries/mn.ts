@@ -14,7 +14,8 @@ export const mn = {
     account: "Миний бүртгэл",
     notifications: "Мэдэгдэл",
     menu: "Цэс",
-    language: "English",
+    language: "Хэл сонгох / Language",
+    theme: "Гэгээлэг / харанхуй горим",
   },
   gallery: {
     title: "Арга хэмжээнүүд",

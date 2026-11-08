@@ -5,6 +5,7 @@ import { locales } from "@/i18n/config";
 import { resolveLocale } from "@/i18n/resolve";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { themeScript } from "@/lib/theme";
 import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin", "cyrillic"] });
@@ -24,7 +25,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const t = getDictionary(locale);
 
   return (
-    <html lang={locale} data-scroll-behavior="smooth" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    // data-theme is set by the script before React loads, so React must not complain about it.
+    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2">
           {locale === "mn" ? "Үндсэн агуулга руу шилжих" : "Skip to content"}

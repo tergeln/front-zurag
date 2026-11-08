@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/[locale]/(auth)/actions";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { LocaleSwitch } from "./locale-switch";
+import { ThemeToggle } from "./theme-toggle";
 import { StaffNav } from "./staff-nav";
 import { staffNavGroups } from "./staff-nav-groups";
 
@@ -53,7 +54,8 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
             utilities={
               <>
                 {notificationsLink}
-                <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
+                <LocaleSwitch locale={locale} label={t.language} />
+              <ThemeToggle label={t.theme} />
                 <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
                 {logoutForm}
               </>
@@ -83,13 +85,15 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
                 {cart > 0 && <span className="rounded-full bg-zinc-900 px-1.5 font-mono text-[11px] leading-5 text-white">{cart}</span>}
               </Link>
               {notificationsLink}
-              <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
+              <LocaleSwitch locale={locale} label={t.language} />
+              <ThemeToggle label={t.theme} />
               <Link href={`/${locale}/account`} className={linkClass}>{t.account}</Link>
               {logoutForm}
             </>
           ) : (
             <>
-              <LocaleSwitch locale={locale} label={t.language} className={linkClass} />
+              <LocaleSwitch locale={locale} label={t.language} />
+              <ThemeToggle label={t.theme} />
               <Link href={`/${locale}/login`} className={linkClass}>{t.login}</Link>
               <Link
                 href={`/${locale}/signup`}
