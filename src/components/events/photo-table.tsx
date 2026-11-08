@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/mn";
-import { deletePhotos, setPhotoPrices } from "@/lib/events/actions";
+import { deletePhotos, hidePhotos, setPhotoPrices, showPhotos } from "@/lib/events/actions";
 import { PHOTO_PAGE_SIZE, type PhotoRow } from "@/lib/events/queries";
 import { formatMnt } from "@/lib/money";
 import { inputClass, secondaryButton, textLink } from "@/components/ui/styles";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { SelectAll } from "./select-all";
 
 function formatBytes(n: number) {
@@ -17,18 +18,20 @@ type Props = {
   rows: PhotoRow[];
   total: number;
   page: number;
-  back: string; // current page path, without query
+  back: string; // current page path, may include filter query (not page)
   showOwner: boolean;
+  showEvent?: boolean;
 };
 
-export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Props) {
+export function PhotoTable({ locale, t, rows, total, page, back, showOwner, showEvent = false }: Props) {
   const p = t.photos;
+  const pageHref = (n: number) => (n ? `${back}${back.includes("?") ? "&" : "?"}page=${n}` : back);
   if (!rows.length) return <p className="rounded-2xl border border-dashed border-zinc-300 p-6 text-zinc-600">{p.empty}</p>;
 
   return (
     <form className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="back" value={page ? `${back}?page=${page}` : back} />
+      <input type="hidden" name="back" value={pageHref(page)} />
 
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
@@ -36,7 +39,9 @@ export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Pr
           <input id="newPrice" name="newPrice" inputMode="numeric" className={`${inputClass} w-36 font-mono`} />
         </div>
         <button formAction={setPhotoPrices} className={secondaryButton}>{p.setPrice}</button>
-        <button formAction={deletePhotos} className={`${secondaryButton} text-red-700`}>{p.delete}</button>
+        <button formAction={hidePhotos} className={secondaryButton}>{p.hide}</button>
+        <button formAction={showPhotos} className={secondaryButton}>{p.show}</button>
+        <ConfirmButton formAction={deletePhotos} message={p.deleteConfirm} className={`${secondaryButton} text-red-700`}>{p.delete}</ConfirmButton>
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-zinc-200 bg-white">
@@ -45,6 +50,7 @@ export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Pr
             <tr>
               <th className="w-10 px-4 py-3"><SelectAll label={p.selectAll} /></th>
               <th className="px-4 py-3 font-medium">{p.file}</th>
+              {showEvent && <th className="px-4 py-3 font-medium">{p.event}</th>}
               {showOwner && <th className="px-4 py-3 font-medium">{p.owner}</th>}
               <th className="px-4 py-3 font-medium">{p.size}</th>
               <th className="px-4 py-3 text-right font-medium">{p.price}</th>
@@ -70,6 +76,9 @@ export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Pr
                     <span className="truncate">{r.original_filename ?? r.id}</span>
                   </div>
                 </td>
+                {showEvent && (
+                  <td className="max-w-[16rem] truncate px-4 py-2.5 text-zinc-600">{(locale === "en" && r.event?.name_en) || r.event?.name_mn || "—"}</td>
+                )}
                 {showOwner && (
                   <td className="px-4 py-2.5 text-zinc-600">{r.owner_type === "platform" ? t.company : (r.owner?.full_name ?? "—")}</td>
                 )}
@@ -84,8 +93,8 @@ export function PhotoTable({ locale, t, rows, total, page, back, showOwner }: Pr
 
       <div className="flex items-center gap-4 text-sm text-zinc-600">
         <span>{page * PHOTO_PAGE_SIZE + 1}-{page * PHOTO_PAGE_SIZE + rows.length} / {total}</span>
-        {page > 0 && <Link href={`${back}?page=${page - 1}`} className={textLink}>{p.prev}</Link>}
-        {(page + 1) * PHOTO_PAGE_SIZE < total && <Link href={`${back}?page=${page + 1}`} className={textLink}>{p.next}</Link>}
+        {page > 0 && <Link href={pageHref(page - 1)} className={textLink}>{p.prev}</Link>}
+        {(page + 1) * PHOTO_PAGE_SIZE < total && <Link href={pageHref(page + 1)} className={textLink}>{p.next}</Link>}
       </div>
       <p className="text-[13px] text-zinc-500">{p.processingNote}</p>
     </form>

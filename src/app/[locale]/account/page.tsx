@@ -8,6 +8,7 @@ import { textLink } from "@/components/ui/styles";
 import { hasBiometricConsent } from "@/lib/public/queries";
 import { withdrawBiometricConsent } from "@/lib/public/actions";
 import { deleteMyAccount } from "@/lib/account/actions";
+import { ProfileForm } from "./profile-form";
 
 const DELETE_ERRORS = ["admin_cannot_delete", "photographer_contact_admin", "confirm_required", "generic"] as const;
 
@@ -29,6 +30,19 @@ export default async function AccountPage({ params, searchParams }: PageProps<"/
         <dt className="text-zinc-500">{t.role}</dt>
         <dd className="text-zinc-900">{t.roles[role]}</dd>
       </dl>
+      <ProfileForm
+        locale={locale}
+        t={t}
+        fullName={user.profile?.full_name ?? null}
+        phone={user.profile?.phone ?? null}
+        language={user.profile?.locale ?? locale}
+      />
+
+      <div className="flex max-w-[60ch] flex-col gap-2 border-t border-zinc-200 pt-6">
+        <h2 className="text-lg font-semibold text-zinc-950">{t.passwordTitle}</h2>
+        <Link href={`/${locale}/reset-password`} className={`${textLink} w-fit`}>{t.changePassword}</Link>
+      </div>
+
       <p className="max-w-[60ch] rounded-2xl border border-dashed border-zinc-300 p-6 leading-relaxed text-zinc-600">{t.emptyPurchases}</p>
 
       <form action={withdrawBiometricConsent} className="flex max-w-[60ch] flex-col gap-2 border-t border-zinc-200 pt-6">

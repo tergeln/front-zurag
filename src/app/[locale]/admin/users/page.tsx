@@ -4,6 +4,7 @@ import { resolveLocale } from "@/i18n/resolve";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { Role, UserStatus } from "@/lib/auth/roles";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { PageIntro } from "@/components/layout/page-intro";
 import { inputClass, secondaryButton, textLink } from "@/components/ui/styles";
 import { formatDate } from "@/lib/format";
@@ -77,9 +78,11 @@ export default async function UsersPage({ params, searchParams }: PageProps<"/[l
                           <input type="hidden" name="userId" value={u.id} />
                           <input type="hidden" name="back" value={back} />
                           <input type="hidden" name="status" value={u.status === "active" ? "suspended" : "active"} />
-                          <button type="submit" className={`${secondaryButton} py-1.5 text-sm`}>
-                            {u.status === "active" ? t.suspend : t.activate}
-                          </button>
+                          {u.status === "active" ? (
+                            <ConfirmButton message={t.suspendConfirm} className={`${secondaryButton} py-1.5 text-sm`}>{t.suspend}</ConfirmButton>
+                          ) : (
+                            <button type="submit" className={`${secondaryButton} py-1.5 text-sm`}>{t.activate}</button>
+                          )}
                         </form>
                       ) : null}
                     </td>

@@ -22,7 +22,8 @@ function readLocale(formData: FormData): Locale {
 /** Only redirect back to our own admin/photographer event pages. */
 function backPath(formData: FormData, locale: Locale): string {
   const back = String(formData.get("back") ?? "");
-  return back.startsWith(`/${locale}/admin/events`) || back.startsWith(`/${locale}/photographer/events`) ? back : `/${locale}`;
+  const allowed = [`/${locale}/admin/events`, `/${locale}/admin/photos`, `/${locale}/photographer/events`];
+  return allowed.some((a) => back.startsWith(a)) ? back : `/${locale}`;
 }
 
 function withError(path: string, key: EventErrorKey) {
@@ -180,4 +181,25 @@ export async function deletePhotos(formData: FormData) {
     if (error) redirect(withError(back, errorKey(error.message)));
   }
   revalidatePath(back);
+}
+
+async function setHidden(formData: FormData, hidden: boolean) {
+  const locale = readLocale(formData);
+  const supabase = await requireSignedIn(locale);
+  const back = backPath(formData, locale);
+  const ids = selectedIds(formData);
+  if (ids.length) {
+    const { error } = await supabase.rpc("set_photos_hidden", { p_photo_ids: ids, p_hidden: hidden });
+    if (error) redirect(withError(back, errorKey(error.message)));
+  }
+  revalidatePath(back);
+}
+
+/** Hidden photos leave galleries, search and carts; buyers keep their downloads. */
+export async function hidePhotos(formData: FormData) {
+  await setHidden(formData, true);
+}
+
+export async function showPhotos(formData: FormData) {
+  await setHidden(formData, false);
 }

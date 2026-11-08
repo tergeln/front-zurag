@@ -6,6 +6,7 @@ export type Profile = {
   role: Role;
   status: UserStatus;
   full_name: string | null;
+  phone?: string | null;
   locale: "mn" | "en";
 };
 

@@ -3,6 +3,7 @@ import { resolveLocale } from "@/i18n/resolve";
 import { requireRole } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { PhotographerStatus } from "@/lib/auth/roles";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { PageIntro } from "@/components/layout/page-intro";
 import { secondaryButton } from "@/components/ui/styles";
 import { formatDate } from "@/lib/format";
@@ -79,9 +80,11 @@ export default async function PhotographersPage({ params, searchParams }: PagePr
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="userId" value={p.user_id} />
                       <input type="hidden" name="status" value={p.status === "approved" ? "suspended" : "approved"} />
-                      <button type="submit" className={`${secondaryButton} py-1.5 text-sm`}>
-                        {p.status === "approved" ? t.suspend : t.reinstate}
-                      </button>
+                      {p.status === "approved" ? (
+                        <ConfirmButton message={t.suspendConfirm} className={`${secondaryButton} py-1.5 text-sm`}>{t.suspend}</ConfirmButton>
+                      ) : (
+                        <button type="submit" className={`${secondaryButton} py-1.5 text-sm`}>{t.reinstate}</button>
+                      )}
                     </form>
                   </td>
                 </tr>
@@ -114,7 +117,7 @@ export default async function PhotographersPage({ params, searchParams }: PagePr
                     <form action={revokeInvitation}>
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="invitationId" value={inv.id} />
-                      <button type="submit" className="text-zinc-600 underline underline-offset-4 hover:text-red-700">{t.revoke}</button>
+                      <ConfirmButton message={t.revokeConfirm} className="text-zinc-600 underline underline-offset-4 hover:text-red-700">{t.revoke}</ConfirmButton>
                     </form>
                   )}
                 </li>

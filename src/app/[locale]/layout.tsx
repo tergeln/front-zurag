@@ -31,7 +31,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </a>
         <SiteHeader locale={locale} t={t.nav} />
         <main id="main" className="flex flex-1 flex-col">{children}</main>
-        <SiteFooter t={t} />
+        <SiteFooter locale={locale} t={t} />
       </body>
     </html>
   );

@@ -2,6 +2,8 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { resolveLocale } from "@/i18n/resolve";
 import { requireApprovedPhotographer } from "@/lib/auth/photographer";
 import { PageIntro } from "@/components/layout/page-intro";
+import Link from "next/link";
+import { textLink } from "@/components/ui/styles";
 import { ProfileForm } from "./profile-form";
 
 export default async function StudioProfilePage({ params }: PageProps<"/[locale]/photographer/profile">) {
@@ -11,6 +13,7 @@ export default async function StudioProfilePage({ params }: PageProps<"/[locale]
 
   return (
     <PageIntro title={dict.studio.profileTitle} lead={dict.studio.profileLead}>
+      <Link href={`/${locale}/photographers/${profile.slug}`} className={`${textLink} w-fit text-sm`}>{dict.studio.publicPage} →</Link>
       <ProfileForm
         locale={locale}
         t={dict.photographer}

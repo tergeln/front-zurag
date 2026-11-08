@@ -26,7 +26,7 @@ export type PublicEvent = Omit<PublicEventCard, "cover_photo_id"> & {
 
 export type PublicPhoto = { id: string; price_mnt: number; width: number | null; height: number | null; owner_name: string | null };
 
-export type PublicPhotoDetail = PublicPhoto & { event_id: string; event_slug: string; event_name_mn: string; event_name_en: string | null };
+export type PublicPhotoDetail = PublicPhoto & { event_id: string; event_slug: string; event_name_mn: string; event_name_en: string | null; owner_slug: string | null };
 
 export const GALLERY_PAGE_SIZE = 60;
 
@@ -59,6 +59,31 @@ export async function getPublicPhotos(ids: string[]): Promise<PublicPhotoDetail[
   const supabase = await createClient();
   const { data } = await supabase.rpc("get_public_photos", { p_ids: ids.slice(0, 200), p_codes: await getEventCodes() });
   return (data ?? []) as PublicPhotoDetail[];
+}
+
+export type PublicPhotographerCard = { slug: string; display_name: string; bio: string | null; photo_count: number; cover_photo_id: string | null };
+export type PublicPhotographer = { slug: string; display_name: string; bio: string | null; portfolio_urls: string[] };
+
+const SLUG_RE = /^[a-z0-9-]{3,40}$/;
+
+export async function listPublicPhotographers(): Promise<PublicPhotographerCard[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("list_public_photographers", { p_limit: 100, p_offset: 0 });
+  return (data ?? []) as PublicPhotographerCard[];
+}
+
+export async function getPublicPhotographer(slug: string): Promise<PublicPhotographer | null> {
+  if (!SLUG_RE.test(slug)) return null;
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("get_public_photographer", { p_slug: slug });
+  return ((data ?? []) as PublicPhotographer[])[0] ?? null;
+}
+
+export async function listPublicPhotographerEvents(slug: string): Promise<PublicEventCard[]> {
+  if (!SLUG_RE.test(slug)) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("list_public_photographer_events", { p_slug: slug });
+  return ((data ?? []) as Omit<PublicEventCard, "face_search_enabled">[]).map((e) => ({ ...e, face_search_enabled: false }));
 }
 
 export type CartRow = {

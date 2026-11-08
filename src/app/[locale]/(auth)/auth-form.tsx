@@ -60,6 +60,11 @@ export function AuthForm({ mode, locale, t, next, initialError }: Props) {
           className={inputClass}
         />
         {isSignup && <p id="password-help" className="text-[13px] text-zinc-500">{t.passwordHelp}</p>}
+        {!isSignup && (
+          <Link href={`/${locale}/forgot-password`} className="w-fit text-[13px] text-zinc-600 underline underline-offset-4 hover:text-zinc-900">
+            {t.forgotLink}
+          </Link>
+        )}
       </div>
 
       {state?.error && (

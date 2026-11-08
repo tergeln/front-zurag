@@ -16,6 +16,7 @@ export type PhotographerProfile = {
   status: PhotographerStatus;
   source: "application" | "invitation";
   approved_at: string | null;
+  slug: string;
 };
 
 export type Application = {

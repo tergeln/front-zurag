@@ -39,7 +39,13 @@ export default async function PhotoPage({ params }: PageProps<"/[locale]/photos/
           <dt className="text-zinc-500">{t.price}</dt>
           <dd className="font-mono text-lg text-zinc-950">{formatMnt(Number(photo.price_mnt))}₮</dd>
           <dt className="text-zinc-500">{t.photographer}</dt>
-          <dd className="text-zinc-900">{photo.owner_name ?? t.company}</dd>
+          <dd className="text-zinc-900">
+            {photo.owner_slug ? (
+              <Link href={`/${locale}/photographers/${photo.owner_slug}`} className={textLink}>{photo.owner_name}</Link>
+            ) : (
+              (photo.owner_name ?? t.company)
+            )}
+          </dd>
         </dl>
         <CartButton photoId={photo.id} initialInCart={cart.has(photo.id)} loggedIn={!!user} loginHref={`/${locale}/login?next=${encodeURIComponent(`/${locale}/photos/${photo.id}`)}`} t={t} />
         <p className="text-sm leading-relaxed text-zinc-500">{t.watermarkNote}</p>

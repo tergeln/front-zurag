@@ -5,6 +5,7 @@ import { resolveLocale } from "@/i18n/resolve";
 import { requireRole } from "@/lib/auth/session";
 import { getEvent, getParticipants, listPhotos } from "@/lib/events/queries";
 import { addParticipant, removeParticipant, type EventErrorKey } from "@/lib/events/actions";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { PageIntro } from "@/components/layout/page-intro";
 import { EventForm } from "@/components/events/event-form";
 import { Uploader } from "@/components/events/uploader";
@@ -60,7 +61,7 @@ export default async function AdminEventPage({ params, searchParams }: PageProps
                   <input type="hidden" name="eventId" value={id} />
                   <input type="hidden" name="userId" value={p.user_id} />
                   <input type="hidden" name="back" value={back} />
-                  <button type="submit" className="text-zinc-600 underline underline-offset-4 hover:text-red-700">{t.participants.remove}</button>
+                  <ConfirmButton message={t.participants.removeConfirm} className="text-zinc-600 underline underline-offset-4 hover:text-red-700">{t.participants.remove}</ConfirmButton>
                 </form>
               </li>
             ))}

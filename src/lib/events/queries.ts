@@ -30,6 +30,7 @@ export type PhotoRow = {
   owner_type: "platform" | "photographer";
   created_at: string;
   owner: { full_name: string | null } | null;
+  event?: { name_mn: string; name_en: string | null } | null;
 };
 
 export type Participant = { user_id: string; role: "owner" | "contributor"; user: { full_name: string | null } | null };
@@ -83,6 +84,32 @@ export async function listPhotos(eventId: string, page: number): Promise<{ rows:
     .select("id, thumb_key, original_filename, bytes, price_mnt, status, owner_type, created_at, owner:users!photos_owner_id_fkey(full_name)", { count: "exact" })
     .eq("event_id", eventId)
     .neq("status", "deleted")
+    .order("created_at", { ascending: false })
+    .range(page * PHOTO_PAGE_SIZE, page * PHOTO_PAGE_SIZE + PHOTO_PAGE_SIZE - 1)
+    .returns<PhotoRow[]>();
+  return { rows: data ?? [], total: count ?? 0 };
+}
+
+const PHOTO_STATUSES = ["uploading", "processing", "ready", "failed", "published", "hidden"] as const;
+export type PhotoFilter = { eventId?: string; status?: (typeof PHOTO_STATUSES)[number] };
+
+export function parsePhotoStatus(v: unknown): PhotoFilter["status"] {
+  return PHOTO_STATUSES.find((s) => s === v);
+}
+
+/** Every photo across events (admin: all of them, through RLS). */
+export async function listAllPhotos(filter: PhotoFilter, page: number): Promise<{ rows: PhotoRow[]; total: number }> {
+  const supabase = await createClient();
+  let q = supabase
+    .from("photos")
+    .select(
+      "id, thumb_key, original_filename, bytes, price_mnt, status, owner_type, created_at, owner:users!photos_owner_id_fkey(full_name), event:events!photos_event_id_fkey(name_mn, name_en)",
+      { count: "exact" },
+    )
+    .neq("status", "deleted");
+  if (filter.eventId && /^[0-9a-f-]{36}$/.test(filter.eventId)) q = q.eq("event_id", filter.eventId);
+  if (filter.status) q = q.eq("status", filter.status);
+  const { data, count } = await q
     .order("created_at", { ascending: false })
     .range(page * PHOTO_PAGE_SIZE, page * PHOTO_PAGE_SIZE + PHOTO_PAGE_SIZE - 1)
     .returns<PhotoRow[]>();
