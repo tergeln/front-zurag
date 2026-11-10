@@ -1,5 +1,6 @@
 "use client";
 
+import { inputClass, primaryButton } from "@/components/ui/styles";
 import { useActionState } from "react";
 import Link from "next/link";
 import type { Locale } from "@/i18n/config";
@@ -14,8 +15,6 @@ type Props = {
   initialError?: AuthErrorKey;
 };
 
-const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-[15px] text-zinc-900 outline-none transition-colors duration-200 placeholder:text-zinc-400 focus:border-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-900/10";
 
 export function AuthForm({ mode, locale, t, next, initialError }: Props) {
   const [state, action, pending] = useActionState(mode === "login" ? signIn : signUp, initialError ? { error: initialError } : undefined);
@@ -74,7 +73,7 @@ export function AuthForm({ mode, locale, t, next, initialError }: Props) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-1 rounded-lg bg-zinc-900 px-4 py-3 text-[15px] font-medium text-white transition-[transform,background-color] duration-200 hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+        className={`mt-1 ${primaryButton}`}
       >
         {pending ? t.pending : isSignup ? t.submitSignup : t.submitLogin}
       </button>

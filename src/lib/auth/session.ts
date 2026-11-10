@@ -1,4 +1,5 @@
 import "server-only";
+import { isLocalPreview } from "@/lib/preview";
 import { cache } from "react";
 import { forbidden, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -9,6 +10,7 @@ export type CurrentUser = { id: string; email: string | undefined; profile: Prof
 
 /** The signed-in user and their profile, or null. Cached per request. */
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
+  if (isLocalPreview()) return null;
   const supabase = await createClient();
   // getUser() verifies the token with Supabase Auth, so it is safe for authorization.
   const { data, error } = await supabase.auth.getUser();

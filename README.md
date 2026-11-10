@@ -21,3 +21,7 @@ npm run lint
 npm run preview   # build for Cloudflare and run the Worker locally, http://localhost:8787
 npm run deploy    # build and deploy to Cloudflare (needs `npx wrangler login` once)
 ```
+
+## Local design preview
+
+`npm run dev` can render the home page and the events empty state without Supabase credentials. This development-only mode treats every visitor as a guest; it does not provide sample accounts or bypass role checks. Add the Supabase URL and publishable key to `.env.local` to use real authentication and event data. Production still requires configuration.

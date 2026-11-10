@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "./brand-logo";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/mn";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -53,9 +54,9 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
   if (staff) {
     return (
       <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
-          <Link href={`/${locale}/${role === "admin" ? "admin" : "photographer"}`} className="mr-auto shrink-0 text-lg font-semibold tracking-tight text-zinc-950">
-            Zurag<span className="text-[var(--color-accent)]">.</span>
+        <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-4 md:px-8">
+          <Link href={`/${locale}/${role === "admin" ? "admin" : "photographer"}`} className="mr-auto shrink-0 brand-wordmark text-2xl font-semibold tracking-tight text-zinc-950">
+            <BrandLogo />
           </Link>
           <StaffNav
             groups={staffNavGroups(role, locale, getDictionary(locale))}
@@ -76,9 +77,9 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
 
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-200/70 bg-[var(--color-paper)]/85 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
-        <Link href={`/${locale}`} className="mr-auto shrink-0 text-lg font-semibold tracking-tight text-zinc-950">
-          Zurag<span className="text-[var(--color-accent)]">.</span>
+      <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-4 md:px-8">
+        <Link href={`/${locale}`} className="mr-auto shrink-0 brand-wordmark text-2xl font-semibold tracking-tight text-zinc-950">
+          <BrandLogo />
         </Link>
 
         <nav aria-label="Main" className="no-scrollbar -mr-2 flex min-w-0 items-center gap-1 overflow-x-auto whitespace-nowrap">
@@ -101,7 +102,7 @@ export async function SiteHeader({ locale, t }: { locale: Locale; t: Dictionary[
               <Link href={`/${locale}/login`} className={linkClass}>{t.login}</Link>
               <Link
                 href={`/${locale}/signup`}
-                className="ml-1 rounded-lg bg-zinc-900 px-3.5 py-2 text-sm font-medium text-white transition-[transform,background-color] duration-200 hover:bg-zinc-800 active:scale-[0.98]"
+                className="ml-1 button-gradient rounded-full px-5 py-2 text-sm font-medium text-white transition-[transform,background-color] duration-200 hover:bg-zinc-800 active:scale-[0.98]"
               >
                 {t.signup}
               </Link>

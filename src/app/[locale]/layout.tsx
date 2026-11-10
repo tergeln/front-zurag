@@ -35,7 +35,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           {locale === "mn" ? "Үндсэн агуулга руу шилжих" : "Skip to content"}
         </a>
         <SiteHeader locale={locale} t={t.nav} />
-        <main id="main" className="flex flex-1 flex-col">{children}</main>
+        <main id="main" className="app-main flex flex-1 flex-col">{children}</main>
         <SiteFooter locale={locale} t={t} />
       </body>
     </html>

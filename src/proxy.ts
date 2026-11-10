@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, isLocale, LOCALE_COOKIE } from "@/i18n/config";
+import { isLocalPreview } from "@/lib/preview";
 import { supabaseEnv } from "@/lib/supabase/env";
 
 /**
@@ -32,6 +33,7 @@ export async function proxy(request: NextRequest) {
   }
 
   let response = NextResponse.next({ request });
+  if (isLocalPreview()) return response;
   const { url, key } = supabaseEnv();
   const supabase = createServerClient(url, key, {
     cookies: {

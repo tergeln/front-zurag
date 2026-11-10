@@ -1,4 +1,5 @@
 import "server-only";
+import { isLocalPreview } from "@/lib/preview";
 import { createClient } from "@/lib/supabase/server";
 import { getEventCodes, getSearchToken } from "./codes";
 
@@ -29,6 +30,7 @@ export type PublicPhoto = { id: string; price_mnt: number; width: number | null;
 export type PublicPhotoDetail = PublicPhoto & { event_id: string; event_slug: string; event_name_mn: string; event_name_en: string | null; owner_slug: string | null };
 
 export async function listPublicEvents(): Promise<PublicEventCard[]> {
+  if (isLocalPreview()) return [];
   const supabase = await createClient();
   const { data } = await supabase.rpc("list_public_events", { p_limit: 60, p_offset: 0 });
   return (data ?? []) as PublicEventCard[];

@@ -3,7 +3,7 @@ import type { LegalDoc } from "@/i18n/legal";
 export function LegalPage({ doc, vars = {} }: { doc: LegalDoc; vars?: Record<string, string> }) {
   const fill = (s: string) => s.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
   return (
-    <article className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 md:px-8 md:py-16">
+    <article className="legal-surface mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-12 md:px-8 md:py-16">
       <header className="flex flex-col gap-3">
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 md:text-4xl">{doc.title}</h1>
         <p className="text-sm text-zinc-500">{doc.updated}</p>
