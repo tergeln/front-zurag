@@ -262,3 +262,32 @@ button { cursor: pointer; }
  .auth-surface { max-width: 540px; }
  .legal-surface { margin-block: 28px; width: calc(100% - 32px); padding: 28px 24px; border-radius: 24px; }
 }
+
+/*
+ * Theme change: the new theme "burns" in from the right (where the switch is)
+ * behind a ragged, flame-like edge. theme-toggle.tsx adds .theme-burn to <html>
+ * and starts a view transition; the new theme's snapshot sits on top of the old
+ * one and is revealed through two copies of the burn mask that slide at
+ * slightly different speeds, so the edge keeps changing shape as it moves.
+ * Browsers without view transitions simply switch at once.
+ */
+.theme-burn *, .theme-burn *::before, .theme-burn *::after { transition: none !important; }
+.theme-burn::view-transition-old(root),
+.theme-burn::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+.theme-burn::view-transition-old(root) { z-index: 0; }
+.theme-burn::view-transition-new(root) {
+  z-index: 1;
+  -webkit-mask-image: url("/images/burn-mask.png"), url("/images/burn-mask.png");
+  mask-image: url("/images/burn-mask.png"), url("/images/burn-mask.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 300% 100%, 300% 190%;
+  mask-size: 300% 100%, 300% 190%;
+  animation: theme-burn 0.85s linear both;
+}
+@keyframes theme-burn {
+  from { -webkit-mask-position: 0% 0%, 0% 100%; mask-position: 0% 0%, 0% 100%; }
+  35% { -webkit-mask-position: 30% 0%, 40% 100%; mask-position: 30% 0%, 40% 100%; }
+  70% { -webkit-mask-position: 72% 0%, 64% 100%; mask-position: 72% 0%, 64% 100%; }
+  to { -webkit-mask-position: 100% 0%, 100% 100%; mask-position: 100% 0%, 100% 100%; }
+}

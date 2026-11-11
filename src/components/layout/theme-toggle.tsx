@@ -1,22 +1,42 @@
 "use client";
 
+import { useEffect } from "react";
 import { THEME_COOKIE } from "@/lib/theme";
+
+const BURN_MASK = "/images/burn-mask.png"; // also named in globals.css (.theme-burn)
 
 /**
  * Light / dark switch. The theme is set on <html data-theme> by a tiny script
  * before the page draws (saved choice, else the device setting); this button
- * flips it and remembers the choice for a year.
+ * flips it and remembers the choice for a year. Where the browser supports
+ * view transitions, the new theme burns in from the right (see globals.css).
  */
 export function ThemeToggle({ label }: { label: string }) {
+  // Load the burn mask ahead of the first click, so the effect never starts blank.
+  useEffect(() => {
+    new Image().src = BURN_MASK;
+  }, []);
+
   return (
     <button
       type="button"
       aria-label={label}
       title={label}
       onClick={() => {
-        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-        document.documentElement.dataset.theme = next;
+        const root = document.documentElement;
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        const apply = () => {
+          root.dataset.theme = next;
+        };
         document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+
+        const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (calm || !document.startViewTransition || root.classList.contains("theme-burn")) {
+          apply();
+          return;
+        }
+        root.classList.add("theme-burn");
+        document.startViewTransition(apply).finished.finally(() => root.classList.remove("theme-burn"));
       }}
       className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 transition-colors duration-200 hover:text-zinc-950"
     >
