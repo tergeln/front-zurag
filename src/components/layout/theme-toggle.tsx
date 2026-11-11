@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { THEME_COOKIE } from "@/lib/theme";
 
-const BURN_MASK = "/images/burn-mask.png"; // also named in globals.css (.theme-burn)
+const BURN_MASK = "/images/burn-blob.png"; // also named in globals.css (.theme-burn)
+const BURN_SOLID = 0.55; // the mask is fully solid out to this fraction of its radius
 
 /**
  * Light / dark switch. The theme is set on <html data-theme> by a tiny script
  * before the page draws (saved choice, else the device setting); this button
  * flips it and remembers the choice for a year. Where the browser supports
- * view transitions, the new theme burns in from the right (see globals.css).
+ * view transitions, the new theme burns outward from this button (see globals.css).
  */
 export function ThemeToggle({ label }: { label: string }) {
   // Load the burn mask ahead of the first click, so the effect never starts blank.
@@ -22,7 +23,7 @@ export function ThemeToggle({ label }: { label: string }) {
       type="button"
       aria-label={label}
       title={label}
-      onClick={() => {
+      onClick={(e) => {
         const root = document.documentElement;
         const next = root.dataset.theme === "dark" ? "light" : "dark";
         const apply = () => {
@@ -35,6 +36,14 @@ export function ThemeToggle({ label }: { label: string }) {
           apply();
           return;
         }
+        // Burn outward from the middle of this button until the farthest corner is covered.
+        const b = e.currentTarget.getBoundingClientRect();
+        const x = b.left + b.width / 2;
+        const y = b.top + b.height / 2;
+        const reach = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+        root.style.setProperty("--burn-x", `${x}px`);
+        root.style.setProperty("--burn-y", `${y}px`);
+        root.style.setProperty("--burn-d", `${Math.ceil((2 * reach) / BURN_SOLID)}px`);
         root.classList.add("theme-burn");
         document.startViewTransition(apply).finished.finally(() => root.classList.remove("theme-burn"));
       }}

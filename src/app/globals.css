@@ -264,11 +264,13 @@ button { cursor: pointer; }
 }
 
 /*
- * Theme change: the new theme "burns" in from the right (where the switch is)
- * behind a ragged, flame-like edge. theme-toggle.tsx adds .theme-burn to <html>
- * and starts a view transition; the new theme's snapshot sits on top of the old
- * one and is revealed through two copies of the burn mask that slide at
- * slightly different speeds, so the edge keeps changing shape as it moves.
+ * Theme change: the new theme "burns" outward from the theme button behind a
+ * ragged, flame-like edge. theme-toggle.tsx adds .theme-burn to <html>, sets
+ * where the button is (--burn-x, --burn-y) and how large the burn must grow
+ * to cover the screen (--burn-d), then starts a view transition. The new
+ * theme's snapshot sits on top of the old one and is revealed through two
+ * copies of a round burn mask centred on the button; they grow at slightly
+ * different speeds and shapes, so the edge keeps changing as it spreads.
  * Browsers without view transitions simply switch at once.
  */
 .theme-burn *, .theme-burn *::before, .theme-burn *::after { transition: none !important; }
@@ -277,17 +279,34 @@ button { cursor: pointer; }
 .theme-burn::view-transition-old(root) { z-index: 0; }
 .theme-burn::view-transition-new(root) {
   z-index: 1;
-  -webkit-mask-image: url("/images/burn-mask.png"), url("/images/burn-mask.png");
-  mask-image: url("/images/burn-mask.png"), url("/images/burn-mask.png");
+  -webkit-mask-image: url("/images/burn-blob.png"), url("/images/burn-blob.png");
+  mask-image: url("/images/burn-blob.png"), url("/images/burn-blob.png");
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
-  -webkit-mask-size: 300% 100%, 300% 190%;
-  mask-size: 300% 100%, 300% 190%;
-  animation: theme-burn 0.85s linear both;
+  animation: theme-burn 0.9s linear both;
 }
+/* Each step keeps both masks centred on the button: position = centre - size / 2. */
 @keyframes theme-burn {
-  from { -webkit-mask-position: 0% 0%, 0% 100%; mask-position: 0% 0%, 0% 100%; }
-  35% { -webkit-mask-position: 30% 0%, 40% 100%; mask-position: 30% 0%, 40% 100%; }
-  70% { -webkit-mask-position: 72% 0%, 64% 100%; mask-position: 72% 0%, 64% 100%; }
-  to { -webkit-mask-position: 100% 0%, 100% 100%; mask-position: 100% 0%, 100% 100%; }
+  from {
+    mask-size: 0 0, 0 0;
+    mask-position: var(--burn-x) var(--burn-y), var(--burn-x) var(--burn-y);
+  }
+  40% {
+    mask-size: calc(var(--burn-d) * 0.3) calc(var(--burn-d) * 0.3), calc(var(--burn-d) * 0.5) calc(var(--burn-d) * 0.34);
+    mask-position:
+      calc(var(--burn-x) - var(--burn-d) * 0.15) calc(var(--burn-y) - var(--burn-d) * 0.15),
+      calc(var(--burn-x) - var(--burn-d) * 0.25) calc(var(--burn-y) - var(--burn-d) * 0.17);
+  }
+  75% {
+    mask-size: calc(var(--burn-d) * 0.72) calc(var(--burn-d) * 0.72), calc(var(--burn-d) * 0.78) calc(var(--burn-d) * 0.56);
+    mask-position:
+      calc(var(--burn-x) - var(--burn-d) * 0.36) calc(var(--burn-y) - var(--burn-d) * 0.36),
+      calc(var(--burn-x) - var(--burn-d) * 0.39) calc(var(--burn-y) - var(--burn-d) * 0.28);
+  }
+  to {
+    mask-size: var(--burn-d) var(--burn-d), calc(var(--burn-d) * 1.2) calc(var(--burn-d) * 0.9);
+    mask-position:
+      calc(var(--burn-x) - var(--burn-d) * 0.5) calc(var(--burn-y) - var(--burn-d) * 0.5),
+      calc(var(--burn-x) - var(--burn-d) * 0.6) calc(var(--burn-y) - var(--burn-d) * 0.45);
+  }
 }
